@@ -25,7 +25,7 @@
   <body>
 		<div class="container">
 			<nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
-				<a class="navbar-brand" href="/" style="font-size: 24px">
+        <a class="navbar-brand" href="{{ "/" | relative_url }}" style="font-size: 24px">
           <img src="{{ "/static/logo.png" | relative_url }}" width="64" height="64" class="d-inline-block align-middle" alt="">
 					hikalium.com
 				</a>
@@ -38,16 +38,16 @@
 					</span>
 					<ul class="navbar-nav">
 						<li class="nav-item">
-							<a class="nav-link" href="/index">Index</a>
+              <a class="nav-link" href="{{"/index" | relative_url }}">Index</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="/products">Products</a>
+              <a class="nav-link" href="{{"/products" | relative_url }}">Products</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="https://hikalium.hatenablog.jp/">Blog</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="/profile">Profile</a>
+              <a class="nav-link" href="{{"/profile" | relative_url }}">Profile</a>
 						</li>
 					</ul>
 				</div>
