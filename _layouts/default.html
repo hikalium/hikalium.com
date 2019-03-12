@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | append: relative_url }}">
-    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | append: relative_url }}">
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | relative_url }}">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | relative_url }}">
 
     <title>hikalium.com</title>
     
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400" rel="stylesheet">
     <script src='https://cdn.rawgit.com/svgdotjs/svg.js/ceaf24d5/dist/svg.min.js'></script>
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
@@ -20,7 +20,7 @@
   <body>
     <div class="wrapper">
       <header>
-        <img src="{{ "/static/logo.png" | append: site.github.build_revision | relative_url }}" style="width: 100%;">
+        <img src="{{ "/static/logo.png" | relative_url }}" style="width: 100%;">
       </header>
       <section>
 
