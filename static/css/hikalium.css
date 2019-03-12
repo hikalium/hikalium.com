@@ -1,0 +1,50 @@
+@charset "UTF-8";
+
+body {
+	background-color: #ffffff;
+	font-family: 'Source Code Pro',"Open Sans","Helvetica Neue",Helvetica,Arial,"ヒラギノ角ゴ ProN W3","Hiragino Kaku Gothic ProN","メイリオ",Meiryo,sans-serif;
+}
+
+div#sidebar {
+}
+
+p {
+  margin-bottom: 2px;
+}
+
+h3 {
+	border-left: #ff8800 solid 2px;
+	border-bottom: #ff8800 solid 1px;
+	padding-left: 8px;
+	padding-bottom: 2px;
+	margin-top: 24px;
+	margin-bottom: 4px;
+	font-size: 18px;
+
+}
+
+h4 {
+	border-left: #00ff00 solid 2px;
+	border-bottom: #00ff00 solid 1px;
+	padding-left: 8px;
+	padding-bottom: 2px;
+}
+
+blockquote {
+	margin-top: 16px;
+	margin-bottom: 0px;
+	padding-top: 12px;
+	padding-bottom: 8px;
+	border-bottom: #f9f9f9 solid 2px;
+}
+
+.navbar-brand {
+	font-family: 'Source Code Pro', monospace;
+	font-weight: lighter;
+	font-size: 24px;
+	margin: 0px 8px 8px 0px;
+}
+
+code {
+	padding: .1rem .5rem;
+}

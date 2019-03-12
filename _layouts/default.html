@@ -4,44 +4,77 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <title>hikalium.com</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | relative_url }}">
     <link rel="icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | relative_url }}">
 
-    <title>hikalium.com</title>
-    
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400" rel="stylesheet">
-    <script src='https://cdn.rawgit.com/svgdotjs/svg.js/ceaf24d5/dist/svg.min.js'></script>
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
-    <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" href="{{ "/static/css/hikalium.css" | relative_url }}" type="text/css" />
+		<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+
+    <script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-66543454-1', 'auto');
+		ga('send', 'pageview');
+		</script>
   </head>
   <body>
+		<div class="container">
+			<nav class="navbar navbar-expand-lg navbar-expand-md navbar-light">
+				<a class="navbar-brand" href="/" style="font-size: 24px">
+          <img src="{{ "/static/logo.png" | relative_url }}" width="64" height="64" class="d-inline-block align-middle" alt="">
+					hikalium.com
+				</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<span class="navbar-nav mr-auto">
+
+					</span>
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<a class="nav-link" href="/index">Index</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/products">Products</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="https://hikalium.hatenablog.jp/">Blog</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/profile">Profile</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+    </div>
+		<div class="container">
+        {{ content }}
+      <footer class='text-right mb-5 mt-5'>
+        <div><small>
+        site revision: {{ site.github.build_revision }}
+        </small></div>
+        <div><small>
+        This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+        </small></div>
+        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+          <img alt="Creative Commons License" style="border-width:0" src='{{ "/static/cc-by-4_0.png" | relative_url }}' height='30px'>
+        </a>
+      </footer>
+		</div>
+		</div>
+    <script src="{{"/static/js/jquery-3.2.1.min.js" | relative_url }}"></script>
+		<script src="{{"/static/js/popper.min.js" | relative_url }}"></script>
+		<script src="{{"/static/js/bootstrap.min.js" | relative_url }}"></script>
+
     <div class="wrapper">
       <header>
-        <img src="{{ "/static/logo.png" | relative_url }}" style="width: 100%;">
       </header>
-      <section>
-
-        {{ content }}
-
-      </section>
-      <footer>
-        <small>site revision: {{ site.github.build_revision }}</small>
-
-      </footer>
     </div>
-    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-    {% if site.google_analytics %}
-    <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-ga('create', '{{ site.google_analytics }}', 'auto');
-ga('send', 'pageview');
-    </script>
-    {% endif %}
   </body>
 </html>
