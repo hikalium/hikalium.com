@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/static/favicon.ico">
-    <link rel="icon" type="image/vnd.microsoft.icon" href="/static/favicon.ico">
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | append: site.github.build_revision | relative_url }}">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ "/static/favicon.ico" | append: site.github.build_revision | relative_url }}">
 
     <title>hikalium.com</title>
     
@@ -20,7 +20,7 @@
   <body>
     <div class="wrapper">
       <header>
-        <img src='/static/logo.png' style='width: 100%;'>
+        <img src="{{ "/static/logo.png" | append: site.github.build_revision | relative_url }}" style="width: 100%;">
       </header>
       <section>
 
