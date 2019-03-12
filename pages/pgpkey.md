@@ -52,4 +52,4 @@ RVRNIsdR0/5WFZR2sa83VeOp
 ```
 
 ### Usage
-- [note/pgp.md](./note/pgp.md)
+- [note/pgp](./note/pgp)

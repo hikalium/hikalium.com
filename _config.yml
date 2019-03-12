@@ -1,3 +1,7 @@
-theme: jekyll-theme-minimal
 exclude: [style.css]
 keep_files: [static/]
+highlighter: rouge
+sass:
+  style: compact
+kramdown:
+  input: GFM
