@@ -27,3 +27,9 @@ To check other projects, see [products](/products).
 - C#
 - PHP
 - [J](http://www.jsoftware.com/)
+
+### Links
+- [OSECPU Wiki](http://osecpu.osask.jp/wiki/?hikarupsp)
+- [CHNOSProject](http://chnosproject.osdn.jp/)
+- [OSASK Wiki](http://osask.net/w/520.html)
+- [Haribote-OS Wiki](http://hrb.osask.jp/wiki/?hikarupsp)
