@@ -60,15 +60,16 @@
 		<div class="container">
         {{ content }}
       <footer class='text-right mb-5 mt-5'>
-        <div><small>
-        site revision: {{ site.github.build_revision }}
-        </small></div>
-        <div><small>
-        This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
-        </small></div>
-        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
-          <img alt="Creative Commons License" style="border-width:0; height: 30px;" src='{{ "/static/cc-by-4_0.png" | relative_url }}'>
-        </a>
+        <small>
+          <p>Hosted on GitHub Pages. Source: <a href="https://github.com/hikalium/hikalium.com">hikalium/hikalium.com</a></p>
+          <p>Site revision: {{ site.github.build_revision }}</p>
+          <p>
+          This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+          </p>
+          <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+            <img alt="Creative Commons License" style="border-width:0; height: 30px;" src='{{ "/static/cc-by-4_0.png" | relative_url }}'>
+          </a>
+        </small>
       </footer>
 		</div>
     <script src="{{"/static/js/jquery-3.2.1.min.js" | relative_url }}"></script>
