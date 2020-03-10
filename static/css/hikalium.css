@@ -38,6 +38,10 @@ blockquote {
 	border-bottom: #f9f9f9 solid 2px;
 }
 
+.navbar {
+  padding-left: 0px;
+}
+
 .navbar-brand {
 	font-family: 'Source Code Pro', monospace;
 	font-weight: lighter;
