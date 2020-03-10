@@ -1,17 +1,27 @@
 ## Profile
+
 ### whois hikalium
+
 Low-level programmer/student.
 
 `hikarupsp` is my alias in `*.osask.jp` domain (in 2014 and before).
 
 ### Contacts
-- Twitter [@hikalium](https://twitter.com/hikalium)
+
+hikalium is on 
+[GitHub](https://github.com/hikalium/compilium),
+[Twitter](https://twitter.com/hikalium),
+[VRChat](https://www.vrchat.com/home/user/usr_e04b3879-5975-45a7-8955-05d924c04593),
+[MDN](https://developer.mozilla.org/ja/profiles/hikalium),
+etc...
+
 - e-mail `hikalium`@`<this domain>`
 
 ### Interest area
-- Low-layer (such as Operating System, CPU, etc...)
+- Low-layer (such as Operating Systems, Compilers, ISAs, etc...)
+  - [liumOS](http://github.com/hikalium/liumos)
+  - [compilium](http://github.com/hikalium/compilium)
   - [OSECPU](http://osecpu.osask.jp/wiki/)
-  - [CHNOSProject](http://chnosproject.osdn.jp/wiki147u/index.php)
 - Chatbot (see [deborah](https://github.com/fourseasonslab/deborah))
 
 To check other projects, see [products](/products).
