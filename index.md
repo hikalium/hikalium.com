@@ -2,5 +2,5 @@
 
 This is hikalium.com.
 
-Do not attack this site. There is no flag at all ;)
+Do not attack this site. There are no flags at all ;)
 
