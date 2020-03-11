@@ -1,4 +1,43 @@
 ## PGP public key of hikalium
+
+To prevent Man-in-the-middle attacks, you should receive fingerprints from another reliable source.
+
+Following fingerprints are just for your reference.
+
+### since 2020-03-11
+
+```
+ pub   ed25519 2020-03-11 [SC]
+      D947 91BA 397E FDCA 2445  445E 35E3 6174 95F0 F899
+```
+
+```
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEXmhMbxYJKwYBBAHaRw8BAQdAIpFJOpHDc2WAyDNbsXbQ6B//Kx0j+92Yar74
+OPP1N5i0IGhpa2FsaXVtIDxoaWthbGl1bUBoaWthbGl1bS5jb20+iJAEExYIADgW
+IQTZR5G6OX79yiRFRF4142F0lfD4mQUCXmhMbwIbAwULCQgHAgYVCgkICwIEFgID
+AQIeAQIXgAAKCRA142F0lfD4mRCPAQD1h3gFGDrBVdGOqsE7ofzPLjMmj/06DS2p
+H/dH+zueJwEA8xJU7jaOcQw28fIAcaVtdU1fs5mO5IMPR+TgFzqnvgi4MwReaExv
+FgkrBgEEAdpHDwEBB0Bfz9eNXQXVBUsdS+cXjzrlXuSQZPLYnInPn9wgqYdfaoh4
+BBgWCAAgFiEE2UeRujl+/cokRUReNeNhdJXw+JkFAl5oTG8CGyAACgkQNeNhdJXw
++JmCuAD/dokhPJFqK0gyj/02oVYCFGqiB8wJI6VD6dU0N18sTIMA/313PrLFcfvU
+RvPEQc24l3NAqobBH3kDaAXY0S8nS8kHuDgEXmhMbxIKKwYBBAGXVQEFAQEHQC6j
+erzmvR96H19d9yT2Mzi+M4YV2ZRu2nxEPKgQe0pAAwEIB4h4BBgWCAAgFiEE2UeR
+ujl+/cokRUReNeNhdJXw+JkFAl5oTG8CGwwACgkQNeNhdJXw+JkT/wEAoe5gE8GA
+NNA6LRuZbW7A81hGBJske2CJkwCt1v9xQVABALl5aPvdjTlBA0BcWEXZCmZMdfBD
+qKRCGSuSzsB8GjgO
+=SHmX
+-----END PGP PUBLIC KEY BLOCK-----
+```
+
+### until 2020-03-11
+
+```
+pub   rsa2048 2016-07-17 [SC]
+      90A7 A2B5 5E6E 13E3 CE1C  645E 29C6 B66D 82CF 5EB2
+```
+
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
@@ -43,13 +82,6 @@ RVRNIsdR0/5WFZR2sa83VeOp
 -----END PGP PUBLIC KEY BLOCK-----
 ```
 
-### Fingerprint
-- To prevent a Man-in-the-middle attack, you should receive this fingerprint from another reliable source.
-- Following fingerprint is just for your reference.
-
-```
-90A7 A2B5 5E6E 13E3 CE1C  645E 29C6 B66D 82CF 5EB2
-```
 
 ### Usage
 - [note/pgp](./note/pgp)
