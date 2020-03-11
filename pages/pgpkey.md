@@ -33,6 +33,10 @@ qKRCGSuSzsB8GjgO
 
 ### until 2020-03-11
 
+This key is affected by a vulnerabilitiy in a hardware key generator.
+
+I still have access to this key so far, but I strongly recommend to use the latest one shown above.
+
 ```
 pub   rsa2048 2016-07-17 [SC]
       90A7 A2B5 5E6E 13E3 CE1C  645E 29C6 B66D 82CF 5EB2
