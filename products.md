@@ -2,6 +2,7 @@
 
 ### 2020
 - [NDCKPT: Transparent Checkpointing on NVDIMM with Operating System Support](https://www.ieice.org/ken/paper/20200227q1vl/)
+  - [PDF](http://www.kasahara.cs.waseda.ac.jp/achieve/pdf/y2019/ETNET2020_CPSY_ndckpt__%E8%A5%BF%E7%94%B0%E3%81%95%E3%82%93.pdf)
   - GitHub: [hikalium/linux-ndckpt](https://github.com/hikalium/linux-ndckpt)
   - [IPSJ Digital Library](http://id.nii.ac.jp/1001/00203154/)
 
