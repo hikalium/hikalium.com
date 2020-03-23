@@ -1,3 +1,10 @@
+---
+permalink: /pgpkey
+redirect_from:
+  - /page/pgpkey
+  - /pages/pgpkey
+---
+
 ## PGP public key of hikalium
 
 To prevent Man-in-the-middle attacks, you should receive fingerprints from another reliable source.
@@ -88,4 +95,4 @@ RVRNIsdR0/5WFZR2sa83VeOp
 
 
 ### Usage
-- [note/pgp](./note/pgp)
+- [note/pgp](/pages/note/pgp)

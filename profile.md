@@ -17,7 +17,7 @@ etc...
 
 - e-mail: `hikalium`@`<this domain>`
 - You can verify me and send encrypted messages through [keybase.io](https://keybase.io/hikalium)
-  - PGP keys are also hosted on this site: [here](https://hikalium.com/pages/pgpkey)
+  - PGP keys are also hosted on this site: [here](/pgpkey)
 
 ### Interest area
 - Low-layer (such as Operating Systems, Compilers, ISAs, etc...)

@@ -5,3 +5,7 @@ sass:
   style: compact
 kramdown:
   input: GFM
+plugins:
+  - jekyll-redirect-from
+whitelist:
+  - jekyll-redirect-from
