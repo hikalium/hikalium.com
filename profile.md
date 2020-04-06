@@ -2,7 +2,7 @@
 
 ### whois hikalium
 
-Low-level programmer.
+Low-level Software Engineer.
 
 `hikarupsp` is my alias in `*.osask.jp` domain (in 2014 and before).
 
