@@ -4,7 +4,7 @@
 
 Low-level Software Engineer.
 
-`hikarupsp` is my alias in `*.osask.jp` domain (in 2014 and before).
+`hikarupsp` was my alias in `*.osask.jp` domain (in 2014 and before).
 
 ### Contacts
 
@@ -31,6 +31,7 @@ To check other projects, see [products](/products).
 ### Available programming languages
 - C
 - C++
+- Rust
 - Assembly(x86)
 - JavaScript
 - TypeScript
