@@ -5,9 +5,10 @@
   - [PDF](http://www.kasahara.cs.waseda.ac.jp/achieve/pdf/y2019/ETNET2020_CPSY_ndckpt__%E8%A5%BF%E7%94%B0%E3%81%95%E3%82%93.pdf)
   - GitHub: [hikalium/linux-ndckpt](https://github.com/hikalium/linux-ndckpt)
   - [IPSJ Digital Library](http://id.nii.ac.jp/1001/00203154/)
+- [opv86](https://hikalium.github.io/opv86/): Opcode/Instruction finder for x86_64 [TypeScript]
 
 ### 2019
-- [compilium](https://github.com/hikalium/compilium): A toy C compiler
+- [compilium](https://github.com/hikalium/compilium): A toy C compiler [C]
 - [OS Girls](https://hikalium.booth.pm/items/1317230) and [OS Girls 2](https://hikalium.booth.pm/items/1576135): Stories of highschool students who are making and understanding operating systems
 - [自作OSのいまと昔](https://knowledge.sakura.ad.jp/serialization/handmade-os/): [さくらのナレッジ](https://knowledge.sakura.ad.jp/)連載記事
 
