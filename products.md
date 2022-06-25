@@ -1,11 +1,22 @@
 ## Products
 
+### 2022
+- [wasabi](https://github.com/hikalium/wasabi): Toy web browser and OS in Rust ("sabi" in Japanese) = WasabiOS
+- [os_dev_specs](https://hikalium.github.io/os_dev_specs/): Index of OS dev related specifications / datasheets
+- [prologium](https://github.com/hikalium/prologium): Prolog interpreter written in Rust
+
+### 2021
+- [keyball-rs](https://github.com/hikalium/keyball-rs): Rust port of keyball46 firmware ([blog post](https://hikalium.hatenablog.jp/entry/2021/12/31/150738))
+- [bingen](https://github.com/hikalium/bingen): Procedure macro for bringing a compile-time compiled assembly code as a binary slice. 
+- [ssh_latency](https://github.com/hikalium/ssh_latency): Ping-like something to measure the latency via ssh
+
 ### 2020
 - [NDCKPT: Transparent Checkpointing on NVDIMM with Operating System Support](https://www.ieice.org/ken/paper/20200227q1vl/)
   - [PDF](http://www.kasahara.cs.waseda.ac.jp/achieve/pdf/y2019/ETNET2020_CPSY_ndckpt__%E8%A5%BF%E7%94%B0%E3%81%95%E3%82%93.pdf)
   - GitHub: [hikalium/linux-ndckpt](https://github.com/hikalium/linux-ndckpt)
   - [IPSJ Digital Library](http://id.nii.ac.jp/1001/00203154/)
 - [opv86](https://hikalium.github.io/opv86/): Opcode/Instruction finder for x86_64 [TypeScript]
+- [timeline-log-viewer](https://github.com/hikalium/timeline-log-viewer): Track my sleep and medicine records using Fitbit and Slack
 
 ### 2019
 - [compilium](https://github.com/hikalium/compilium): A toy C compiler [C]
