@@ -4,6 +4,7 @@
 - [wasabi](https://github.com/hikalium/wasabi): Toy web browser and OS in Rust ("sabi" in Japanese) = WasabiOS
 - [os_dev_specs](https://hikalium.github.io/os_dev_specs/): Index of OS dev related specifications / datasheets
 - [prologium](https://github.com/hikalium/prologium): Prolog interpreter written in Rust
+- [Making Android Runtime on Chrome OS more secure and easier to upgrade with ARCVM - chromeos.dev](https://chromeos.dev/en/posts/making-android-more-secure-with-arcvm)
 
 ### 2021
 - [keyball-rs](https://github.com/hikalium/keyball-rs): Rust port of keyball46 firmware ([blog post](https://hikalium.hatenablog.jp/entry/2021/12/31/150738))
