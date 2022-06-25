@@ -2,9 +2,7 @@
 
 ### whois hikalium
 
-Low-level Software Engineer.
-
-`hikarupsp` was my alias in `*.osask.jp` domain (in 2014 and before).
+Low-level Software Engineer
 
 ### Contacts
 
@@ -23,11 +21,11 @@ etc...
 ### Interest area
 - Low-layer (such as Operating Systems, Compilers, ISAs, etc...)
   - [liumOS](http://github.com/hikalium/liumos)
-  - [compilium](http://github.com/hikalium/compilium)
+  - [wasabi](http://github.com/hikalium/wasabi)
   - [OSECPU](http://osecpu.osask.jp/wiki/)
 - Chatbot (see [deborah](https://github.com/fourseasonslab/deborah))
 
-To check other projects, see [products](/products).
+Please check [products](/products) to see my projects.
 
 ### Available programming languages
 - C
