@@ -12,9 +12,12 @@ gpg --import gpgkey.pub
 # フィンガープリントの確認
 gpg --fingerprint test@example.com
 # 暗号化
-gpg -o targetfile.encrypted -r hikalium@hikalium.com --encrypt targetfile
+export TARGET=${PATH_TO_TARGET_FILE}
+gpg -o ${TARGET}.encrypted -r hikalium@hikalium.com --encrypt ${TARGET}
 # 復号
 gpg -o targetfile --decrypt targetfile.encrypted
+# yubikeyに格納された証明書の表示
+gpg --card-status
 ```
 
 ### 参考文献
