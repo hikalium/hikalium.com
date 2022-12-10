@@ -66,3 +66,12 @@ UserPIN ResetCode AdminPIN
 ### メモ
 - `gpg2 -k`で鍵リスト表示
 
+### ykman
+
+```
+/Applications/YubiKey\ Manager.app/Contents/MacOS/ykman list
+/Applications/YubiKey\ Manager.app/Contents/MacOS/ykman info
+
+
+```
+
