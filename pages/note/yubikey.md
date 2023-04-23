@@ -10,7 +10,7 @@
 ### Debian (Crostini on ChromeOS)
 
 ```
-sudo apt install opensc-pkcs11 opensc
+sudo apt install opensc-pkcs11 opensc gpg-agent
 ```
 
 ```
@@ -43,6 +43,18 @@ hikalium@penguin:~$ ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
 Enter passphrase for PKCS#11: 
 Card added: /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
 ```
+
+
+```
+# To solve `sign_and_send_pubkey: signing failed for RSA "PIV AUTH pubkey" from agent: agent refused operation` erro on ssh:
+# https://github.com/Yubico/yubico-piv-tool/issues/319
+gpg-connect-agent updatestartuptty /bye
+killall ssh-agent
+eval `ssh-agent`
+ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
+ssh vega
+```
+
 
 
 
