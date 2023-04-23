@@ -41,8 +41,6 @@ chmod 755 yubikey-manager-qt-1.2.5-linux.AppImage
 ```
 hikalium@penguin:~$ ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so 
 Enter passphrase for PKCS#11: 
-Card added: /usr/lib/x86_64-linux-gnu/opensc-pkcs11.sohikalium@penguin:~$ ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so 
-Enter passphrase for PKCS#11: 
 Card added: /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
 ```
 
