@@ -31,6 +31,13 @@ eval `ssh-agent`
 ```
 
 ```
+wget https://developers.yubico.com/yubikey-manager-qt/Releases/yubikey-manager-qt-1.2.5-linux.AppImage
+chmod 755 yubikey-manager-qt-1.2.5-linux.AppImage 
+./yubikey-manager-qt-1.2.5-linux.AppImage
+# reset, set PIN, PUK
+```
+
+```
 ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
 ```
 
