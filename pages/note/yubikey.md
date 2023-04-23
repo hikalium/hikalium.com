@@ -6,6 +6,36 @@
  - http://www.cuspy.org/diary/2015-08-11-yubikey-piv-ssh/
 
 ## 手順
+
+### Debian (Crostini on ChromeOS)
+
+```
+sudo apt install opensc-pkcs11 opensc
+```
+
+```
+hikalium@penguin:~$ opensc-tool -l
+# Detected readers (pcsc)
+Nr.  Card  Features  Name
+0    Yes             Yubico YubiKey OTP+FIDO+CCID 00 0
+```
+
+```
+hikalium@penguin:~$ dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so
+/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
+/usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so
+```
+
+```
+eval `ssh-agent`
+```
+
+```
+ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
+```
+
+
+
 ### Mac OSX
 * Yubikey PIV Managerをインストール
 * Certificates -> Authentication -> Generate new key ...
