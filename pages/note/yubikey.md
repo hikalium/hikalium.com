@@ -22,7 +22,7 @@ sudo apt upgrade -y
 sudo apt install -y opensc-pkcs11 opensc gpg-agent scdaemon yubikey-manager
 ```
 
-status commands (try `reboot` if they don't recognize the device)
+status commands (try `sudo reboot` if they don't recognize the device)
 ```
 ykman info
 opensc-tool -l
