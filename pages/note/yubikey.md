@@ -9,46 +9,43 @@
 
 ### Crostini on ChromeOS (Debian)
 
+verified on:
 ```
 $ cat /etc/debian_version 
 11.7
 ```
 
+packages needed:
 ```
 sudo apt update
 sudo apt upgrade -y
 sudo apt install -y opensc-pkcs11 opensc gpg-agent scdaemon yubikey-manager
 ```
 
+status commands (try `reboot` if they don't recognize the device)
 ```
-hikalium@penguin:~$ opensc-tool -l
-# Detected readers (pcsc)
-Nr.  Card  Features  Name
-0    Yes             Yubico YubiKey OTP+FIDO+CCID 00 0
-```
-
-```
-hikalium@penguin:~$ dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so
-/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
-/usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so
+ykman info
+opensc-tool -l
 ```
 
+check if slot9a exists (used by opensc-pkcs11) and PIN retry counter:
+```
+ykman piv info
+```
+
+check path of opensc-pkcs11.so 
+```
+dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so
+```
+
+start ssh agent
 ```
 eval `ssh-agent`
 ```
 
+add key to ssh agent (Please note that the PIN is different from PGP User/Admin PIN!!!!)
 ```
-# https://developers.yubico.com/yubikey-manager-qt/Releases/
-wget https://developers.yubico.com/yubikey-manager-qt/Releases/yubikey-manager-qt-1.2.5-linux.AppImage
-chmod 755 yubikey-manager-qt-1.2.5-linux.AppImage 
-./yubikey-manager-qt-1.2.5-linux.AppImage
-# reset, set PIN, PUK
-```
-
-```
-hikalium@penguin:~$ ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so 
-Enter passphrase for PKCS#11: 
-Card added: /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
+ssh-add -s `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1` 
 ```
 
 
