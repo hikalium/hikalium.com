@@ -7,10 +7,17 @@
 
 ## 手順
 
-### Debian (Crostini on ChromeOS)
+### Crostini on ChromeOS (Debian)
 
 ```
-sudo apt install opensc-pkcs11 opensc gpg-agent
+$ cat /etc/debian_version 
+11.7
+```
+
+```
+sudo apt update
+sudo apt upgrade -y
+sudo apt install -y opensc-pkcs11 opensc gpg-agent scdaemon yubikey-manager
 ```
 
 ```
