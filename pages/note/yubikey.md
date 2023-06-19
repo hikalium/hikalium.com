@@ -10,53 +10,62 @@
 ### Crostini on ChromeOS (Debian)
 
 verified on:
-```
+```bash
 $ cat /etc/debian_version 
 11.7
 ```
 
 packages needed:
-```
+```bash
 sudo apt update
 sudo apt upgrade -y
 sudo apt install -y opensc-pkcs11 opensc gpg-agent scdaemon yubikey-manager
 ```
 
 status commands (try `sudo reboot` if they don't recognize the device)
-```
+```bash
 ykman info
 opensc-tool -l
 ```
 
 check if slot9a exists (used by opensc-pkcs11) and PIN retry counter:
+```bash
+ykman piv info | grep -A 7 9a
 ```
-ykman piv info
+
+if not, generate one with:
+```bash
+ykman piv keys generate 9a pubkey.pem
+ykman piv certificates generate --subject "hikalium" 9a pubkey.pem
+ykman piv info | grep -A 7 9a
+```
+
+extract pubkey as needed (`PIV AUTH pubkey` should be used for ssh auth)
+```bash
+ssh-keygen -D `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1`
 ```
 
 add key to ssh agent (Please note that the PIN is different from PGP User/Admin PIN!!!!)
-```
-eval `ssh-agent` && ykman info && ssh-add -s `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1` 
+```bash
+killall ssh-agent ; eval `ssh-agent` && ykman info && ssh-add -s `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1` 
 ```
 
-
+now you should be able to ssh
 ```
-# To solve `sign_and_send_pubkey: signing failed for RSA "PIV AUTH pubkey" from agent: agent refused operation` erro on ssh:
-# https://github.com/Yubico/yubico-piv-tool/issues/319
-gpg-connect-agent updatestartuptty /bye
-killall ssh-agent
-eval `ssh-agent`
-ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
 ssh vega
 ```
 
-create device local key for the ChromeOS host via Crostini
+workaround for `sign_and_send_pubkey: signing failed for RSA "PIV AUTH pubkey" from agent: agent refused operation` erro on ssh
+```bash
+# based on: https://github.com/Yubico/yubico-piv-tool/issues/319
+gpg-connect-agent updatestartuptty /bye
 ```
+
+create device local key for the ChromeOS host via Crostini
+```bash
 ssh-keygen -t ed25519 -f /mnt/chromeos/MyFiles/keys/id_ed25519
 cat /mnt/chromeos/MyFiles/keys/id_ed25519.pub
 ```
-
-
-
 
 ### Mac OSX
 * Yubikey PIV Managerをインストール
