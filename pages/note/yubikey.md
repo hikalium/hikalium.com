@@ -45,7 +45,7 @@ eval `ssh-agent`
 
 add key to ssh agent (Please note that the PIN is different from PGP User/Admin PIN!!!!)
 ```
-ssh-add -s `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1` 
+ykman info && ssh-add -s `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1` 
 ```
 
 
