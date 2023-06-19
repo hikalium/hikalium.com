@@ -33,19 +33,9 @@ check if slot9a exists (used by opensc-pkcs11) and PIN retry counter:
 ykman piv info
 ```
 
-check path of opensc-pkcs11.so 
-```
-dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so
-```
-
-start ssh agent
-```
-eval `ssh-agent`
-```
-
 add key to ssh agent (Please note that the PIN is different from PGP User/Admin PIN!!!!)
 ```
-ykman info && ssh-add -s `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1` 
+eval `ssh-agent` && ykman info && ssh-add -s `dpkg -L opensc-pkcs11 | grep /opensc-pkcs11.so | head -n 1` 
 ```
 
 
