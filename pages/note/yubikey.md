@@ -59,6 +59,11 @@ ssh-add -s /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so
 ssh vega
 ```
 
+create device local key for the ChromeOS host via Crostini
+```
+ssh-keygen -t ed25519 -f /mnt/chromeos/MyFiles/keys/id_ed25519
+```
+
 
 
 
