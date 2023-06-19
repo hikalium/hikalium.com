@@ -62,6 +62,7 @@ ssh vega
 create device local key for the ChromeOS host via Crostini
 ```
 ssh-keygen -t ed25519 -f /mnt/chromeos/MyFiles/keys/id_ed25519
+cat /mnt/chromeos/MyFiles/keys/id_ed25519.pub
 ```
 
 
