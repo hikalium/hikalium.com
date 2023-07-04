@@ -7,6 +7,7 @@ Low-level Software Engineer
 ### Contacts
 
 hikalium is on 
+[misskey.hikalium.dev](https://misskey.hikalium.dev/@hikalium)
 [GitHub](https://github.com/hikalium),
 [Twitter](https://twitter.com/hikalium),
 [VRChat](https://www.vrchat.com/home/user/usr_e04b3879-5975-45a7-8955-05d924c04593),
