@@ -16,8 +16,6 @@ Low-level Software Engineer
 
 [VRChat](https://www.vrchat.com/home/user/usr_e04b3879-5975-45a7-8955-05d924c04593)
 
-[MDN](https://developer.mozilla.org/ja/profiles/hikalium)
-
 [SoundCloud](https://soundcloud.com/hikalium)
 
 ### sendmail hikalium
