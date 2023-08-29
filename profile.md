@@ -25,7 +25,7 @@ Low-level Software Engineer
 
 A virtual existence on the Internet (physically bounded)
 
-Interests/Expertise: Operating Systems, Networking, Cyber Security and Virtualizations
+Interests/Expertise: Operating System, Virtualization, Networking and Cyber Security
 
 ### ldd hikalium
 - Rust
@@ -40,8 +40,10 @@ Interests/Expertise: Operating Systems, Networking, Cyber Security and Virtualiz
 - PHP
 - [J](http://www.jsoftware.com/)
 
-### find hikalium
+### grep hikalium
 - [OSECPU Wiki](http://osecpu.osask.jp/wiki/?hikarupsp)
 - [CHNOSProject](http://chnosproject.osdn.jp/)
 - [OSASK Wiki](http://osask.net/w/520.html)
 - [Haribote-OS Wiki](http://hrb.osask.jp/wiki/?hikarupsp)
+- [Security Camp](https://www.ipa.go.jp/en/about/it-talents/security-camp.html): 2016 as a participant, 2017- as a lecturer
+- [STEP](https://landing.google.com/intl/ALL_jp/step/): 2017 as a participant, 2021- as a lecturer
