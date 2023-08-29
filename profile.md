@@ -4,34 +4,33 @@
 
 Low-level Software Engineer
 
-### Contacts
+### which hikalium
 
-hikalium is on 
-[misskey.hikalium.dev](https://misskey.hikalium.dev/@hikalium)
-[GitHub](https://github.com/hikalium),
-[Twitter](https://twitter.com/hikalium),
-[VRChat](https://www.vrchat.com/home/user/usr_e04b3879-5975-45a7-8955-05d924c04593),
-[MDN](https://developer.mozilla.org/ja/profiles/hikalium),
-[SoundCloud](https://soundcloud.com/hikalium),
-etc...
+- [misskey.hikalium.dev](https://misskey.hikalium.dev/@hikalium)
+- [X a.k.a. Twitter](https://twitter.com/hikalium)
+- [GitHub](https://github.com/hikalium)
+- [Chromium Gerrit](https://chromium-review.googlesource.com/q/owner:hikalium@chromium.org)
+- [VRChat](https://www.vrchat.com/home/user/usr_e04b3879-5975-45a7-8955-05d924c04593)
+- [MDN](https://developer.mozilla.org/ja/profiles/hikalium)
+- [SoundCloud](https://soundcloud.com/hikalium)
 
-- e-mail: `hikalium`@`<this domain>`
-- You can verify me and send encrypted messages through [keybase.io](https://keybase.io/hikalium)
-  - PGP keys are also hosted on this site: [here](/pgpkey)
+### sendmail hikalium
 
-### Interest area
-- Low-layer (such as Operating Systems, Compilers, ISAs, etc...)
-  - [liumOS](http://github.com/hikalium/liumos)
-  - [wasabi](http://github.com/hikalium/wasabi)
-  - [OSECPU](http://osecpu.osask.jp/wiki/)
-- Chatbot (see [deborah](https://github.com/fourseasonslab/deborah))
+- `hikalium@${THIS_DOMAIN}`
+- You can verify me at [keybase.io](https://keybase.io/hikalium)
+- PGP public keys are [here](/pgpkey)
+- Encrypted messages are welcome via any channels ;)
 
-Please check [products](/products) to see my projects.
+### file hikalium
 
-### Available programming languages
+A virtual existence on the Internet (physically bounded)
+
+Interests/Expertise: Operating Systems, Networking, Cyber Security and Virtualizations
+
+### ldd hikalium
+- Rust
 - C
 - C++
-- Rust
 - Assembly(x86)
 - JavaScript
 - TypeScript
@@ -41,7 +40,7 @@ Please check [products](/products) to see my projects.
 - PHP
 - [J](http://www.jsoftware.com/)
 
-### Links
+### find hikalium
 - [OSECPU Wiki](http://osecpu.osask.jp/wiki/?hikarupsp)
 - [CHNOSProject](http://chnosproject.osdn.jp/)
 - [OSASK Wiki](http://osask.net/w/520.html)
