@@ -1,11 +1,7 @@
 class VoiceRecorder {
-  constructor() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      console.error('getUserMedia is not supported on your browser!');
-      return;
-    }
+  constructor(stream) {
+    this.stream = stream;
     this.mediaRecorder = [];
-    this.stream = null;
     this.chunks = [];
     this.isRecording = false;
     this.recorderRef = document.querySelector('#recorder');
@@ -14,14 +10,6 @@ class VoiceRecorder {
     this.stopRef = document.querySelector('#stop');
     this.startRef.onclick = this.startRecording.bind(this);
     this.stopRef.onclick = this.stopRecording.bind(this);
-    const constraints = {audio: true, video: false};
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then((stream) => {
-          this.stream = stream;
-        })
-        .catch((e) => {
-          console.error('getUserMedia failed: ', e);
-        });
   }
   startRecording() {
     if (this.isRecording) return;
@@ -59,4 +47,75 @@ class VoiceRecorder {
     this.mediaRecorder.stop()
   }
 }
-window.voiceRecorder = new VoiceRecorder();
+
+class VoiceVisualiser {
+  constructor(stream) {
+    this.audioCtx = new AudioContext();
+    this.source = this.audioCtx.createMediaStreamSource(stream);
+    this.analyser = this.audioCtx.createAnalyser();
+    this.analyser.fftSize = 2048;
+    const bufferLength = this.analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    const canvas = document.querySelector('#visualiser');
+    const canvasCtx = canvas.getContext("2d");
+
+    this.source.connect(this.analyser);
+    let draw = () => {
+      const WIDTH = canvas.width
+      const HEIGHT = canvas.height;
+
+      requestAnimationFrame(draw);
+
+      this.analyser.getByteTimeDomainData(dataArray);
+
+      canvasCtx.fillStyle = 'rgba(255,255,255,0.2)';
+      canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+
+      canvasCtx.beginPath();
+
+      let sliceWidth = WIDTH * 1.0 / bufferLength;
+      let x = 0;
+
+
+      for (let i = 0; i < bufferLength; i++) {
+        let v = dataArray[i] / 128.0;
+        let y = v * HEIGHT / 2;
+
+        if (i === 0) {
+          canvasCtx.moveTo(x, y);
+        } else {
+          canvasCtx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+      }
+
+      canvasCtx.lineTo(canvas.width, canvas.height / 2);
+      canvasCtx.stroke();
+    };
+
+    draw();
+  }
+}
+
+
+const constraints = {
+  audio: true,
+  video: false
+};
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+        window.voiceRecorder = new VoiceRecorder(stream);
+        window.VoiceVisualiser = new VoiceVisualiser(stream);
+        this.stream = stream;
+      })
+      .catch((e) => {
+        console.error('getUserMedia failed: ', e);
+      });
+} else {
+  console.error('getUserMedia is not supported on your browser!');
+}
