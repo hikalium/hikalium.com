@@ -67,9 +67,15 @@ ssh-keygen -t ed25519 -f /mnt/chromeos/MyFiles/keys/id_ed25519
 cat /mnt/chromeos/MyFiles/keys/id_ed25519.pub
 ```
 
-hint: lookup live hosts
+Hint: lookup live hosts
 ```bash
 nmap -sP -R 192.168.100.1-254
+```
+
+Hint: To restart the crostini container, hit `Ctrl-Alt-T` while focusing on a browser window to open crosh, and run:
+```bash
+vmc stop termina
+vmc start termina
 ```
 
 ### Mac OSX
