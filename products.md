@@ -1,10 +1,14 @@
 ## Products
 
+### 2023
+- [google/cro3](https://github.com/google/cro3): Abstraction Layer of ChromiumOS development
+
 ### 2022
 - [wasabi](https://github.com/hikalium/wasabi): Toy web browser and OS in Rust ("sabi" in Japanese) = WasabiOS
 - [os_dev_specs](https://hikalium.github.io/os_dev_specs/): Index of OS dev related specifications / datasheets
 - [prologium](https://github.com/hikalium/prologium): Prolog interpreter written in Rust
-- [Making Android Runtime on Chrome OS more secure and easier to upgrade with ARCVM - chromeos.dev](https://chromeos.dev/en/posts/making-android-more-secure-with-arcvm)
+- [Making Android Runtime on Chrome OS more secure and easier to upgrade with ARCVM - chromeos.dev](https://chromeos.dev/en/posts/making-android-runtime-on-chromeos-more-secure-and-easier-to-upgrade-with-arcvm)
+- [hikalium/sr5900p](https://github.com/hikalium/sr5900p): A command line tool for TEPRA SR5900P
 
 ### 2021
 - [keyball-rs](https://github.com/hikalium/keyball-rs): Rust port of keyball46 firmware ([blog post](https://hikalium.hatenablog.jp/entry/2021/12/31/150738))
@@ -22,7 +26,7 @@
 ### 2019
 - [compilium](https://github.com/hikalium/compilium): A toy C compiler [C]
 - [OS Girls](https://hikalium.booth.pm/items/1317230) and [OS Girls 2](https://hikalium.booth.pm/items/1576135): Stories of highschool students who are making and understanding operating systems
-- [自作OSのいまと昔](https://knowledge.sakura.ad.jp/serialization/handmade-os/): [さくらのナレッジ](https://knowledge.sakura.ad.jp/)連載記事
+- [自作OSのいまと昔](https://knowledge.sakura.ad.jp/25000/): [さくらのナレッジ](https://knowledge.sakura.ad.jp/)連載記事
 
 ### 2018
 - [liumOS](https://github.com/hikalium/liumos): A toy operating system supports UEFI boot
@@ -42,7 +46,6 @@
 ### 2015
 - [bubble canvas](http://hikalium.github.io/bubbleCanvas/): キャンバスいっぱいにカラフルな円がアニメーションする [JavaScript]
 - [Stempad](http://stempad.jp): 文章中の単語に対する概念の差異を明確にするシステムおよびエディタ [TypeScript]
-- [松木ルー](https://twitter.com/js_tsubot01): ジャストシステム短期インターン「人工無能バトル」に参加した際の成果物。[Python]
 
 ### 2014
 - [Mind Graph Canvas](http://hikalium.github.io/mgcanvas/www/index.html): 人工知能の知識データベース視覚化を目的 [JavaScript][TypeScript]
