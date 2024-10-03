@@ -7,6 +7,15 @@
 
 ## 手順
 
+### SSH app on ChromeOS (Not in Crostini, the Linux environment)
+
+- c.f. https://davecoyle.com/tech-notes/yubikey-ssh-on-a-chromebook/
+
+key points:
+
+- Download and install: https://chrome.google.com/webstore/detail/smart-card-connector/khpfeaanjngmcnplbdlpegiifgpfgdco
+- set "SSH relay server options" to `--ssh-agent=gsc`
+
 ### Crostini on ChromeOS (Debian)
 
 verified on:
