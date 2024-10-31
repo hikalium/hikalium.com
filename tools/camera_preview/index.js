@@ -1,5 +1,6 @@
 const constraints = {
-  video : true
+  video : true,
+  audio : true,
 };
 
 const cameraOptions = document.querySelector('.video-options>select');
@@ -18,7 +19,7 @@ cameraOptions.onchange = () => {
       deviceId : {exact : cameraOptions.value}
     }
   };
-  startStream(updatedConstraints);
+  startVideoStream(updatedConstraints);
 };
 
 let streamStarted = false;
@@ -26,10 +27,6 @@ start.onclick = async () => {
   if (streamStarted) {
     video.play();
     return;
-  } else {
-  const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  await getCameraSelection();
-
   }
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
     if (cameraOptions.value.length > 0) {
@@ -40,10 +37,11 @@ start.onclick = async () => {
           deviceId : {exact : cameraOptions.value}
         }
       };
-      startStream(updatedConstraints);
+      startVideoStream(updatedConstraints);
     } else {
       console.log("first time");
-      startStream(constraints);
+      startVideoStream(constraints);
+      await getCameraSelection();
     }
   }
 };
@@ -57,10 +55,13 @@ const doScreenshot = () => {
   screenshotImage.src = canvas.toDataURL('image/webp');
 };
 screenshot.onclick = doScreenshot;
-const startStream = async (newConstraints) => {
+
+const startVideoStream = async (newConstraints) => {
   const stream = await navigator.mediaDevices.getUserMedia(newConstraints);
   video.srcObject = stream;
+  console.log(stream);
 };
+
 const getCameraSelection = async () => {
   const devices = await navigator.mediaDevices.enumerateDevices();
   console.log(devices)
