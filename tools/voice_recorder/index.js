@@ -40,6 +40,9 @@ class VoiceRecorder {
       const blob = new Blob(this.chunks, {'type': 'audio/wav'})
       const audioURL = window.URL.createObjectURL(blob);
       this.playerRef.src = audioURL;
+      this.playerRef.preload = "auto";
+      this.playerRef.load();
+      this.playerRef.play();
       this.chunks = [];
     };
     this.recorderRef.play();
