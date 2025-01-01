@@ -6,8 +6,10 @@ class VoiceRecorder {
     this.isRecording = false;
     this.recorderRef = document.querySelector('#recorder');
     this.playerRef = document.querySelector('#player');
-    this.buttonRef = document.querySelector('#recordButton');
-    this.buttonRef.onclick = this.startStop.bind(this);
+    this.recordButtonRef = document.querySelector('#recordButton');
+    this.recordButtonRef.onclick = this.startStop.bind(this);
+    this.playButton = document.querySelector('#playButton');
+    this.playButton.onclick = this.play.bind(this);
   }
   startStop() {
     if (this.isRecording) {
@@ -21,7 +23,7 @@ class VoiceRecorder {
   startRecording() {
     if (this.isRecording) return;
     this.isRecording = true;
-    this.buttonRef.innerHTML = 'Stop';
+    this.recordButtonRef.innerHTML = 'Stop';
     this.playerRef.src = '';
     this.stream.oninactive = () => {
       console.log('Stream ended!')
@@ -37,24 +39,45 @@ class VoiceRecorder {
       this.chunks.push(e.data);
     };
     this.mediaRecorder.onstop = (e) => {
-      const blob = new Blob(this.chunks, {'type': 'audio/wav'})
-      const audioURL = window.URL.createObjectURL(blob);
-      this.playerRef.src = audioURL;
-      this.playerRef.preload = "auto";
-      this.playerRef.load();
-      this.playerRef.play();
-      this.chunks = [];
+      const blob = new Blob(this.chunks, {'type': 'audio/wav'});
+      console.log(blob);
+      this.lastRecordBlob = blob;
     };
     this.recorderRef.play();
     this.mediaRecorder.start();
   }
-
   stopRecording() {
     if (!this.isRecording) return;
     this.isRecording = false;
-    this.buttonRef.innerHTML = 'Start';
+    this.recordButtonRef.innerHTML = 'Start';
     this.recorderRef.pause();
     this.mediaRecorder.stop()
+  }
+  play() {
+    const fr = new FileReader();
+    fr.onloadend = () => {
+      const ab = fr.result;
+      console.log(ab);
+      const audioCtx = new AudioContext();
+      audioCtx.decodeAudioData(ab, (sourceAudioBuffer) => {
+        console.log(sourceAudioBuffer);
+        const sourceAudio = audioCtx.createBufferSource();
+        sourceAudio.buffer = sourceAudioBuffer;
+        //const gainNodeL = audioCtx.createGain();
+        //const gainNodeR = audioCtx.createGain();
+        //const merger = audioCtx.createChannelMerger(2);
+        //sourceAudio.connect(gainNodeL);
+        //sourceAudio.connect(gainNodeR);
+        //gainNodeL.connect(merger, 0, 0);
+        //gainNodeR.connect(merger, 0, 1);
+        //merger.connect(audioCtx.destination);
+        sourceAudio.connect(audioCtx.destination);
+        console.log(sourceAudio);
+        sourceAudio.start();
+      });
+    };
+    fr.readAsArrayBuffer(this.lastRecordBlob);
+    this.chunks = [];
   }
 }
 
