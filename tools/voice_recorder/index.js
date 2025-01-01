@@ -9,17 +9,25 @@ class VoiceRecorder {
     this.recordButtonRef.onclick = this.startStop.bind(this);
     this.playButton = document.querySelector('#playButton');
     this.playButton.onclick = this.play.bind(this);
+    this.selectTabButton = document.querySelector('#selectTabButton');
+    this.selectTabButton.onclick = this.selectTab.bind(this);
   }
   startStop() {
     if (this.isRecording) {
-      this.stopRecording()
-      console.log("start")
-    } else {
-      this.startRecording()
       console.log("stop")
+      this.stopRecording()
+    } else {
+      console.log("start")
+      this.startRecording()
     }
   }
-  startRecording() {
+  async selectTab() {
+    let stream = await startCapture();
+    console.log("tab stream:", stream);
+    this.currentTabAudioTrack = stream.getAudioTracks()[0];
+    console.log(this.currentTabAudioTrack);
+  }
+  async startRecording() {
     if (this.isRecording) return;
     this.isRecording = true;
     this.recordButtonRef.innerHTML = 'Stop';
@@ -61,15 +69,23 @@ class VoiceRecorder {
         console.log(sourceAudioBuffer);
         const sourceAudio = audioCtx.createBufferSource();
         sourceAudio.buffer = sourceAudioBuffer;
+        const tabMediaStream = new MediaStream();
+        tabMediaStream.addTrack(this.currentTabAudioTrack);
+        const tabAudioElement = new Audio();
+        tabAudioElement.srcObject = tabMediaStream;
+        tabAudioElement.muted = true;
+        tabAudioElement.play();
+        const tabAudioNode = audioCtx.createMediaStreamSource(tabAudioElement.captureStream());
+        console.log(tabAudioNode);
         //const gainNodeL = audioCtx.createGain();
         //const gainNodeR = audioCtx.createGain();
-        //const merger = audioCtx.createChannelMerger(2);
-        //sourceAudio.connect(gainNodeL);
-        //sourceAudio.connect(gainNodeR);
+        const merger = audioCtx.createChannelMerger(2);
+        sourceAudio.connect(merger);
+        tabAudioNode.connect(merger);
         //gainNodeL.connect(merger, 0, 0);
         //gainNodeR.connect(merger, 0, 1);
         //merger.connect(audioCtx.destination);
-        sourceAudio.connect(audioCtx.destination);
+        merger.connect(audioCtx.destination);
         console.log(sourceAudio);
         sourceAudio.start();
       });
@@ -139,14 +155,29 @@ const constraints = {
 };
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
   navigator.mediaDevices.getUserMedia(constraints)
-      .then((stream) => {
-        window.voiceRecorder = new VoiceRecorder(stream);
-        window.VoiceVisualiser = new VoiceVisualiser(stream);
-        this.stream = stream;
-      })
-      .catch((e) => {
-        console.error('getUserMedia failed: ', e);
-      });
+    .then((stream) => {
+      window.voiceRecorder = new VoiceRecorder(stream);
+      window.VoiceVisualiser = new VoiceVisualiser(stream);
+      this.stream = stream;
+    })
+    .catch((e) => {
+      console.error('getUserMedia failed: ', e);
+    });
 } else {
   console.error('getUserMedia is not supported on your browser!');
+}
+
+async function startCapture() {
+  let captureStream = null;
+  const displayMediaOptions = {
+    video: true,
+    audio: true,
+  };
+  try {
+    captureStream =
+      await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+  } catch (err) {
+    console.error(`Error: ${err}`);
+  }
+  return captureStream;
 }
