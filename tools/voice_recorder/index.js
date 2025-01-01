@@ -5,7 +5,6 @@ class VoiceRecorder {
     this.chunks = [];
     this.isRecording = false;
     this.recorderRef = document.querySelector('#recorder');
-    this.playerRef = document.querySelector('#player');
     this.recordButtonRef = document.querySelector('#recordButton');
     this.recordButtonRef.onclick = this.startStop.bind(this);
     this.playButton = document.querySelector('#playButton');
@@ -24,7 +23,6 @@ class VoiceRecorder {
     if (this.isRecording) return;
     this.isRecording = true;
     this.recordButtonRef.innerHTML = 'Stop';
-    this.playerRef.src = '';
     this.stream.oninactive = () => {
       console.log('Stream ended!')
     };
