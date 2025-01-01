@@ -6,15 +6,22 @@ class VoiceRecorder {
     this.isRecording = false;
     this.recorderRef = document.querySelector('#recorder');
     this.playerRef = document.querySelector('#player');
-    this.startRef = document.querySelector('#start');
-    this.stopRef = document.querySelector('#stop');
-    this.startRef.onclick = this.startRecording.bind(this);
-    this.stopRef.onclick = this.stopRecording.bind(this);
+    this.buttonRef = document.querySelector('#recordButton');
+    this.buttonRef.onclick = this.startStop.bind(this);
+  }
+  startStop() {
+    if (this.isRecording) {
+      this.stopRecording()
+      console.log("start")
+    } else {
+      this.startRecording()
+      console.log("stop")
+    }
   }
   startRecording() {
     if (this.isRecording) return;
     this.isRecording = true;
-    this.startRef.innerHTML = 'Recording...';
+    this.buttonRef.innerHTML = 'Stop';
     this.playerRef.src = '';
     this.stream.oninactive = () => {
       console.log('Stream ended!')
@@ -42,7 +49,7 @@ class VoiceRecorder {
   stopRecording() {
     if (!this.isRecording) return;
     this.isRecording = false;
-    this.startRef.innerHTML = 'Start';
+    this.buttonRef.innerHTML = 'Start';
     this.recorderRef.pause();
     this.mediaRecorder.stop()
   }
