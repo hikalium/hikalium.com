@@ -6,3 +6,5 @@ ffmpeg -loglevel warning -f lavfi -i "color = color=0000ff: size=4x4, format = r
 ffmpeg -loglevel warning -f lavfi -i "color = color=ff00ff: size=4x4, format = rgb24" -update 1 -frames:v 1 -y "ff00ff_rgb_4x4.bmp"
 ffmpeg -loglevel warning -f lavfi -i "color = color=ffff00: size=4x4, format = rgb24" -update 1 -frames:v 1 -y "ffff00_rgb_4x4.bmp"
 ffmpeg -loglevel warning -f lavfi -i "color = color=00ffff: size=4x4, format = rgb24" -update 1 -frames:v 1 -y "00ffff_rgb_4x4.bmp"
+ffmpeg -loglevel warning -f lavfi -i "color = color=112233: size=5x5, format = rgb24" -update 1 -frames:v 1 -y "112233_rgb_5x5.bmp"
+xxd -r -p ./white_diamond_5x5.bmp.hex > ./white_diamond_5x5.bmp
