@@ -67,14 +67,17 @@ class VoiceRecorder {
       const audioCtx = new AudioContext();
       audioCtx.decodeAudioData(ab, (sourceAudioBuffer) => {
         const merger = audioCtx.createChannelMerger(2);
-
         console.log(sourceAudioBuffer);
         const sourceAudio = audioCtx.createBufferSource();
+        {
+          // mono to stereo
         sourceAudio.buffer = sourceAudioBuffer;
-        sourceAudio.connect(merger);
+          const splitter = audioCtx.createChannelSplitter(2);
+          sourceAudio.connect(splitter);
 
-        //const gainNodeL = audioCtx.createGain();
-        //const gainNodeR = audioCtx.createGain();
+        splitter.connect(merger, 0, 0);
+        splitter.connect(merger, 0, 1);
+        }
 
         if(this.currentTabAudioTrack !== undefined) {
           const tabMediaStream = new MediaStream();
@@ -87,6 +90,9 @@ class VoiceRecorder {
           console.log(tabAudioNode);
           tabAudioNode.connect(merger);
         }
+
+        //const gainNodeL = audioCtx.createGain();
+        //const gainNodeR = audioCtx.createGain();
         //gainNodeL.connect(merger, 0, 0);
         //gainNodeR.connect(merger, 0, 1);
         //merger.connect(audioCtx.destination);
