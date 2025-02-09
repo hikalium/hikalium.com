@@ -1,10 +1,15 @@
 class VoiceRecorder {
   constructor(stream) {
+    this.audioCtx = new AudioContext();
     this.stream = stream;
-    this.mediaRecorder = [];
+    this.source = this.audioCtx.createMediaStreamSource(this.stream);
+    this.inputNode = this.audioCtx.createChannelMerger(2);
+    this.source.connect(this.inputNode);
+    this.destNode = this.audioCtx.createMediaStreamDestination();
+    this.inputNode.connect(this.destNode);
+    this.mediaRecorder = new MediaRecorder(this.destNode.stream);
     this.chunks = [];
     this.isRecording = false;
-    this.recorderRef = document.querySelector('#recorder');
     this.recordButtonRef = document.querySelector('#recordButton');
     this.recordButtonRef.onclick = this.startStop.bind(this);
     this.playButton = document.querySelector('#playButton');
@@ -34,7 +39,6 @@ class VoiceRecorder {
     this.isRecording = true;
     this.recordButtonRef.innerHTML = 'Stop';
     this.stream.oninactive = () => { console.log('Stream ended!') };
-    this.recorderRef.srcObject = this.stream;
     const options = {
       audioBitsPerSecond : 1411 * 1000,
       mimeType : 'audio/wav',
@@ -47,7 +51,6 @@ class VoiceRecorder {
       console.log(blob);
       this.lastRecordBlob = blob;
     };
-    this.recorderRef.play();
     this.mediaRecorder.start();
   }
   stopRecording() {
@@ -55,7 +58,6 @@ class VoiceRecorder {
       return;
     this.isRecording = false;
     this.recordButtonRef.innerHTML = 'Start';
-    this.recorderRef.pause();
     this.mediaRecorder.stop()
   }
   play() {
@@ -63,15 +65,14 @@ class VoiceRecorder {
     fr.onloadend = () => {
       const ab = fr.result;
       console.log(ab);
-      const audioCtx = new AudioContext();
-      audioCtx.decodeAudioData(ab, (sourceAudioBuffer) => {
-        const merger = audioCtx.createChannelMerger(2);
+      this.audioCtx.decodeAudioData(ab, (sourceAudioBuffer) => {
+        const merger = this.audioCtx.createChannelMerger(2);
         console.log(sourceAudioBuffer);
-        const sourceAudio = audioCtx.createBufferSource();
+        const sourceAudio = this.audioCtx.createBufferSource();
         {
           // mono to stereo
           sourceAudio.buffer = sourceAudioBuffer;
-          const splitter = audioCtx.createChannelSplitter(2);
+          const splitter = this.audioCtx.createChannelSplitter(2);
           sourceAudio.connect(splitter);
 
           splitter.connect(merger, 0, 0);
@@ -85,18 +86,13 @@ class VoiceRecorder {
           tabAudioElement.srcObject = tabMediaStream;
           tabAudioElement.muted = true;
           tabAudioElement.play();
-          const tabAudioNode =
-              audioCtx.createMediaStreamSource(tabAudioElement.captureStream());
+          const tabAudioNode = this.audioCtx.createMediaStreamSource(
+              tabAudioElement.captureStream());
           console.log(tabAudioNode);
           tabAudioNode.connect(merger);
         }
 
-        // const gainNodeL = audioCtx.createGain();
-        // const gainNodeR = audioCtx.createGain();
-        // gainNodeL.connect(merger, 0, 0);
-        // gainNodeR.connect(merger, 0, 1);
-        // merger.connect(audioCtx.destination);
-        merger.connect(audioCtx.destination);
+        merger.connect(this.audioCtx.destination);
         console.log(sourceAudio);
         sourceAudio.start();
       });
