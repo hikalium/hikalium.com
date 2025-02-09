@@ -14,9 +14,11 @@ class VoiceRecorder {
   }
   startStop() {
     if (this.isRecording) {
-      console.log("stop") this.stopRecording()
+      console.log("stop");
+      this.stopRecording()
     } else {
-      console.log("start") this.startRecording()
+      console.log("start");
+      this.startRecording()
     }
   }
   async selectTab() {
