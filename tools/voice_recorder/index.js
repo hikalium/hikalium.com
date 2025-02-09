@@ -66,22 +66,27 @@ class VoiceRecorder {
       console.log(ab);
       const audioCtx = new AudioContext();
       audioCtx.decodeAudioData(ab, (sourceAudioBuffer) => {
+        const merger = audioCtx.createChannelMerger(2);
+
         console.log(sourceAudioBuffer);
         const sourceAudio = audioCtx.createBufferSource();
         sourceAudio.buffer = sourceAudioBuffer;
-        const tabMediaStream = new MediaStream();
-        tabMediaStream.addTrack(this.currentTabAudioTrack);
-        const tabAudioElement = new Audio();
-        tabAudioElement.srcObject = tabMediaStream;
-        tabAudioElement.muted = true;
-        tabAudioElement.play();
-        const tabAudioNode = audioCtx.createMediaStreamSource(tabAudioElement.captureStream());
-        console.log(tabAudioNode);
+        sourceAudio.connect(merger);
+
         //const gainNodeL = audioCtx.createGain();
         //const gainNodeR = audioCtx.createGain();
-        const merger = audioCtx.createChannelMerger(2);
-        sourceAudio.connect(merger);
-        tabAudioNode.connect(merger);
+
+        if(this.currentTabAudioTrack !== undefined) {
+          const tabMediaStream = new MediaStream();
+          tabMediaStream.addTrack(this.currentTabAudioTrack);
+          const tabAudioElement = new Audio();
+          tabAudioElement.srcObject = tabMediaStream;
+          tabAudioElement.muted = true;
+          tabAudioElement.play();
+          const tabAudioNode = audioCtx.createMediaStreamSource(tabAudioElement.captureStream());
+          console.log(tabAudioNode);
+          tabAudioNode.connect(merger);
+        }
         //gainNodeL.connect(merger, 0, 0);
         //gainNodeR.connect(merger, 0, 1);
         //merger.connect(audioCtx.destination);
