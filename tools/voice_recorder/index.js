@@ -24,6 +24,7 @@ class VoiceRecorder {
   async selectTab() {
     let stream = await startCapture();
     console.log("tab stream:", stream);
+      window.VoiceVisualiser.connectMediaStream(stream);
     this.currentTabAudioTrack = stream.getAudioTracks()[0];
     console.log(this.currentTabAudioTrack);
   }
@@ -109,15 +110,12 @@ class VoiceRecorder {
 class VoiceVisualiser {
   constructor(stream) {
     this.audioCtx = new AudioContext();
-    this.source = this.audioCtx.createMediaStreamSource(stream);
     this.analyser = this.audioCtx.createAnalyser();
     this.analyser.fftSize = 2048;
     const bufferLength = this.analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     const canvas = document.querySelector('#visualiser');
     const canvasCtx = canvas.getContext("2d");
-
-    this.source.connect(this.analyser);
     let draw = () => {
       const WIDTH = canvas.width
       const HEIGHT = canvas.height;
@@ -157,6 +155,10 @@ class VoiceVisualiser {
 
     draw();
   }
+  connectMediaStream(stream) {
+    this.source = this.audioCtx.createMediaStreamSource(stream);
+    this.source.connect(this.analyser);
+  }
 }
 
 
@@ -168,7 +170,8 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
   navigator.mediaDevices.getUserMedia(constraints)
     .then((stream) => {
       window.voiceRecorder = new VoiceRecorder(stream);
-      window.VoiceVisualiser = new VoiceVisualiser(stream);
+      window.VoiceVisualiser = new VoiceVisualiser();
+      window.VoiceVisualiser.connectMediaStream(stream);
       this.stream = stream;
     })
     .catch((e) => {
