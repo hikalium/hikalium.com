@@ -156,12 +156,22 @@ class VoiceVisualiser {
 }
 
 const constraints = {
-  audio : { autoGainControl: false },
+  audio : {
+    autoGainControl: false,
+    channelCount: 1,
+    echoCancellation: false,
+    noiseSuppression: false,
+    sampleRate: {max: 48000, min: 48000},
+    sampleSize: {max: 16, min: 16},
+    voiceIsolation: false,
+  },
   video : false
 };
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
   navigator.mediaDevices.getUserMedia(constraints)
       .then((stream) => {
+        let track = stream.getAudioTracks()[0];
+        console.log(track.getCapabilities());
         window.voiceRecorder = new VoiceRecorder(stream);
         window.VoiceVisualiser = new VoiceVisualiser();
         window.VoiceVisualiser.connectMediaStream(stream);
