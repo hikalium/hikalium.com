@@ -156,7 +156,7 @@ class VoiceVisualiser {
 }
 
 const constraints = {
-  audio : true,
+  audio : { autoGainControl: false },
   video : false
 };
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
