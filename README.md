@@ -1,6 +1,7 @@
 ## Local Setup
 
 ```
+sudo apt install ruby bundler
 sudo gem update bundler
 sudo chown -R $USER:$USER /var/lib/gems /usr/local/bin/
 bundle install
