@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chord Preview Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans h-screen flex flex-col overflow-hidden">
+
+  <!-- 画面上部：現在のコードと追加ボタン -->
+  <div class="p-6 bg-white shadow-sm flex flex-col items-center z-10">
+    <h1 class="text-lg font-bold text-gray-700 mb-4">Chord Preview Tool</h1>
+    <div class="flex items-center gap-4">
+      <div id="main-chord-container"></div>
+      <button 
+        id="add-btn"
+        class="w-14 h-14 flex items-center justify-center bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:bg-gray-300 text-white rounded-full shadow-md transition-colors outline-none"
+        title="現在の和音を保存"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-8 h-8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 画面中央部：保存されたコード一覧 -->
+  <div id="saved-chords-container" class="flex-1 overflow-y-auto p-6">
+    <!-- JSで動的に生成 -->
+  </div>
+
+  <!-- 画面下部：ピアノ鍵盤 -->
+  <div class="w-full overflow-x-auto bg-gray-800 p-4 pb-8 flex justify-center shadow-inner shrink-0">
+    <div id="keyboard-container" class="relative flex select-none" style="height: 200px;">
+      <!-- JSで動的に生成 -->
+    </div>
+  </div>
+
+  <script>
+    // C4からB5までの2オクターブ分の音階データ
+    const NOTES = [
+      { id: 'C4', name: 'C', isBlack: false, freq: 261.63 },
+      { id: 'C#4', name: 'C#', isBlack: true, freq: 277.18 },
+      { id: 'D4', name: 'D', isBlack: false, freq: 293.66 },
+      { id: 'D#4', name: 'D#', isBlack: true, freq: 311.13 },
+      { id: 'E4', name: 'E', isBlack: false, freq: 329.63 },
+      { id: 'F4', name: 'F', isBlack: false, freq: 349.23 },
+      { id: 'F#4', name: 'F#', isBlack: true, freq: 369.99 },
+      { id: 'G4', name: 'G', isBlack: false, freq: 392.00 },
+      { id: 'G#4', name: 'G#', isBlack: true, freq: 415.30 },
+      { id: 'A4', name: 'A', isBlack: false, freq: 440.00 },
+      { id: 'A#4', name: 'A#', isBlack: true, freq: 466.16 },
+      { id: 'B4', name: 'B', isBlack: false, freq: 493.88 },
+      { id: 'C5', name: 'C', isBlack: false, freq: 523.25 },
+      { id: 'C#5', name: 'C#', isBlack: true, freq: 554.37 },
+      { id: 'D5', name: 'D', isBlack: false, freq: 587.33 },
+      { id: 'D#5', name: 'D#', isBlack: true, freq: 622.25 },
+      { id: 'E5', name: 'E', isBlack: false, freq: 659.25 },
+      { id: 'F5', name: 'F', isBlack: false, freq: 698.46 },
+      { id: 'F#5', name: 'F#', isBlack: true, freq: 739.99 },
+      { id: 'G5', name: 'G', isBlack: false, freq: 783.99 },
+      { id: 'G#5', name: 'G#', isBlack: true, freq: 830.61 },
+      { id: 'A5', name: 'A', isBlack: false, freq: 880.00 },
+      { id: 'A#5', name: 'A#', isBlack: true, freq: 932.33 },
+      { id: 'B5', name: 'B', isBlack: false, freq: 987.77 },
+    ];
+
+    // アプリケーションの状態
+    let selectedKeys = [];
+    let savedChords = [];
+    
+    // LocalStorageから初期読み込み
+    try {
+      const item = localStorage.getItem('chordPreviewer_savedChords');
+      if (item) savedChords = JSON.parse(item);
+    } catch (error) {
+      console.error("Failed to parse saved chords from localStorage:", error);
+    }
+
+    // AudioContext管理
+    let audioCtx = null;
+    const keyStops = {}; // 鍵盤個別の再生状態管理
+
+    // 選択された音から簡易的にコード名を判定する関数
+    function detectChord(selectedIds) {
+      if (!selectedIds || selectedIds.length === 0) return { name: "No Selection", notes: "" };
+      
+      const sortedNotes = selectedIds
+        .map(id => {
+          const index = NOTES.findIndex(n => n.id === id);
+          return { id, index, name: NOTES[index].name };
+        })
+        .sort((a, b) => a.index - b.index);
+
+      const notesStr = sortedNotes.map(n => n.id).join(', ');
+
+      if (selectedIds.length === 1) {
+        return { name: sortedNotes[0].name, notes: notesStr };
+      }
+
+      const rootIndex = sortedNotes[0].index;
+      const intervals = sortedNotes.map(n => n.index - rootIndex);
+      const intervalsStr = intervals.join(',');
+      const rootName = sortedNotes[0].name;
+
+      const chordMap = {
+        '0,4,7': 'Major', '0,3,7': 'm', '0,4,7,10': '7', '0,4,7,11': 'M7',
+        '0,3,7,10': 'm7', '0,3,6': 'dim', '0,3,6,9': 'dim7', '0,4,8': 'aug',
+        '0,2,7': 'sus2', '0,5,7': 'sus4', '0,4,7,9': '6', '0,3,7,9': 'm6',
+      };
+
+      const chordType = chordMap[intervalsStr];
+      if (chordType) {
+        return { name: `${rootName} ${chordType === 'Major' ? '' : chordType}`, notes: notesStr };
+      }
+
+      return { name: "Custom Chord", notes: notesStr };
+    }
+
+    // Web Audio APIの初期化
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // 指定された音階IDの配列を同時に鳴らす
+    function playTones(ids) {
+      if (ids.length === 0) return () => {};
+      initAudio();
+      
+      const masterGain = audioCtx.createGain();
+      masterGain.gain.value = Math.max(0.1, 1 / (ids.length * 0.8));
+      masterGain.connect(audioCtx.destination);
+
+      const stops = ids.map(id => {
+        const note = NOTES.find(n => n.id === id);
+        if (!note) return null;
+        
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.value = note.freq;
+        
+        osc.connect(gainNode);
+        gainNode.connect(masterGain);
+        
+        const now = audioCtx.currentTime;
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(1, now + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.7, now + 0.3);
+        
+        osc.start(now);
+        
+        return () => {
+          const stopTime = audioCtx.currentTime;
+          gainNode.gain.cancelScheduledValues(stopTime);
+          gainNode.gain.setValueAtTime(gainNode.gain.value, stopTime);
+          gainNode.gain.linearRampToValueAtTime(0.01, stopTime + 0.1);
+          osc.stop(stopTime + 0.1);
+        };
+      }).filter(Boolean);
+
+      return () => stops.forEach(stop => stop && stop());
+    }
+
+    // --- UI レンダリング・イベント処理 ---
+
+    function saveAndRender() {
+      try {
+        localStorage.setItem('chordPreviewer_savedChords', JSON.stringify(savedChords));
+      } catch (e) {
+        console.error(e);
+      }
+      renderUI();
+    }
+
+    function toggleKey(id) {
+      if (selectedKeys.includes(id)) {
+        selectedKeys = selectedKeys.filter(k => k !== id);
+      } else {
+        selectedKeys.push(id);
+      }
+      renderUI();
+    }
+
+    function createChordButtonElement(ids, label, notes, isMain) {
+      const btn = document.createElement('button');
+      btn.disabled = ids.length === 0;
+      
+      const baseClass = "flex flex-col items-center justify-center px-6 py-4 rounded-xl shadow-md transition-colors select-none outline-none";
+      const styleClass = isMain 
+        ? "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white min-w-[240px] disabled:bg-gray-300"
+        : "bg-white hover:bg-gray-50 active:bg-gray-200 text-blue-900 border border-blue-200 min-w-[160px]";
+      btn.className = `${baseClass} ${styleClass}`;
+
+      btn.innerHTML = `
+        <span class="text-xl font-bold mb-1">${label}</span>
+        <span class="text-sm ${isMain ? 'text-blue-200' : 'text-blue-500'}">${notes || '-'}</span>
+      `;
+
+      let stopFn = null;
+
+      const start = (e) => {
+        if (e) e.preventDefault();
+        if (stopFn) return;
+        stopFn = playTones(ids);
+      };
+
+      const stop = (e) => {
+        if (e) e.preventDefault();
+        if (stopFn) {
+          stopFn();
+          stopFn = null;
+        }
+      };
+
+      btn.addEventListener('mousedown', start);
+      btn.addEventListener('mouseup', stop);
+      btn.addEventListener('mouseleave', stop);
+      btn.addEventListener('touchstart', start);
+      btn.addEventListener('touchend', stop);
+
+      return btn;
+    }
+
+    function renderUI() {
+      // 1. 上部のメインコードボタン更新
+      const mainContainer = document.getElementById('main-chord-container');
+      mainContainer.innerHTML = '';
+      const currentInfo = detectChord(selectedKeys);
+      mainContainer.appendChild(
+        createChordButtonElement(selectedKeys, currentInfo.name, currentInfo.notes, true)
+      );
+
+      // 追加ボタンの制御
+      document.getElementById('add-btn').disabled = selectedKeys.length === 0;
+
+      // 2. 中央の保存済みコード一覧更新
+      const savedContainer = document.getElementById('saved-chords-container');
+      savedContainer.innerHTML = '';
+      
+      if (savedChords.length === 0) {
+        savedContainer.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-gray-400">
+            <p>画面下の鍵盤をクリックして音を選択し、</p>
+            <p>上部の「＋」ボタンを押して和音をここに追加します。</p>
+          </div>
+        `;
+      } else {
+        const wrap = document.createElement('div');
+        wrap.className = "flex flex-wrap gap-4 justify-center items-start content-start";
+        
+        savedChords.forEach((chordIds, idx) => {
+          const info = detectChord(chordIds);
+          const itemDiv = document.createElement('div');
+          itemDiv.className = "relative group";
+          
+          itemDiv.appendChild(createChordButtonElement(chordIds, info.name, info.notes, false));
+          
+          const delBtn = document.createElement('button');
+          delBtn.className = "absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs shadow";
+          delBtn.innerHTML = "✕";
+          delBtn.title = "削除";
+          delBtn.onclick = () => {
+            savedChords.splice(idx, 1);
+            saveAndRender();
+          };
+          itemDiv.appendChild(delBtn);
+          
+          wrap.appendChild(itemDiv);
+        });
+        savedContainer.appendChild(wrap);
+      }
+
+      // 3. 鍵盤の更新
+      const keyboardContainer = document.getElementById('keyboard-container');
+      keyboardContainer.innerHTML = '';
+      
+      let whiteKeysBefore = 0;
+      
+      // 白鍵の生成
+      NOTES.filter(n => !n.isBlack).forEach((note) => {
+        const key = document.createElement('div');
+        const isSelected = selectedKeys.includes(note.id);
+        
+        key.className = `w-14 h-full border border-gray-300 rounded-b flex flex-col items-center justify-end pb-4 cursor-pointer transition-colors ${isSelected ? 'bg-blue-200 border-blue-400' : 'bg-white hover:bg-gray-100'}`;
+        
+        key.innerHTML = `
+          <div class="w-3 h-3 rounded-full mb-2 ${isSelected ? 'bg-blue-500' : 'bg-transparent'}"></div>
+          <span class="text-xs font-semibold text-gray-400 pointer-events-none">${note.name}</span>
+        `;
+        
+        bindKeyEvents(key, note.id);
+        keyboardContainer.appendChild(key);
+      });
+      
+      // 黒鍵の生成
+      NOTES.filter(n => n.isBlack).forEach((note) => {
+        whiteKeysBefore = NOTES.slice(0, NOTES.findIndex(n => n.id === note.id)).filter(n => !n.isBlack).length;
+        
+        const key = document.createElement('div');
+        const isSelected = selectedKeys.includes(note.id);
+        
+        key.className = `absolute top-0 w-8 h-3/5 rounded-b border border-gray-900 z-10 cursor-pointer transition-colors flex flex-col items-center justify-end pb-2 ${isSelected ? 'bg-blue-600' : 'bg-gray-900 hover:bg-gray-700'}`;
+        key.style.left = `${whiteKeysBefore * 56 - 16}px`;
+        
+        key.innerHTML = `
+          <div class="w-2 h-2 rounded-full mb-1 ${isSelected ? 'bg-white' : 'bg-transparent'}"></div>
+        `;
+        
+        bindKeyEvents(key, note.id, true);
+        keyboardContainer.appendChild(key);
+      });
+    }
+
+    // 鍵盤個別のイベントバインド
+    function bindKeyEvents(element, noteId, isBlack = false) {
+      const handleStart = (e) => {
+        if (isBlack) e.stopPropagation();
+        e.preventDefault();
+        toggleKey(noteId);
+        if (!keyStops[noteId]) {
+          keyStops[noteId] = playTones([noteId]);
+        }
+      };
+
+      const handleStop = (e) => {
+        if (isBlack) e.stopPropagation();
+        e.preventDefault();
+        if (keyStops[noteId]) {
+          keyStops[noteId]();
+          keyStops[noteId] = null;
+        }
+      };
+
+      element.addEventListener('mousedown', handleStart);
+      element.addEventListener('mouseup', handleStop);
+      element.addEventListener('mouseleave', handleStop);
+      element.addEventListener('touchstart', handleStart);
+      element.addEventListener('touchend', handleStop);
+    }
+
+    // 追加ボタンのイベント
+    document.getElementById('add-btn').addEventListener('click', () => {
+      if (selectedKeys.length > 0) {
+        savedChords.push([...selectedKeys]);
+        saveAndRender();
+      }
+    });
+
+    // 初回描画
+    renderUI();
+  </script>
+</body>
+</html>
