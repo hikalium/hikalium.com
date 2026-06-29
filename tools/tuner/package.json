@@ -1,0 +1,9 @@
+{
+  "name": "tuner",
+  "version": "1.0.0",
+  "description": "Web tuner: detects pitch from the mic waveform and shows the cents deviation.",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}
