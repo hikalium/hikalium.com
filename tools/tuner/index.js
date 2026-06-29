@@ -189,8 +189,100 @@ class Tuner {
       this.thresholdValue.textContent = this.minRms.toFixed(3);
     };
 
+    // Floor-noise removal. Pressing the button waits 1s, then records the
+    // frequencies detected over the next 2s (assumed to be floor noise) and
+    // suppresses those frequency bins from later detections.
+    this.denoiseButton = document.querySelector('#denoiseButton');
+    this.denoiseStatus = document.querySelector('#denoiseStatus');
+    this.denoiseButton.onclick = this.toggleDenoise.bind(this);
+    this.denoise = {
+      state : 'off',       // 'off' | 'delay' | 'measuring' | 'active'
+      startTime : 0,       // performance.now() when the current phase began
+      samples : [],        // detected frequencies collected while measuring
+      bins : new Set(),    // blacklisted frequency bins (see freqToBin)
+    };
+
     // Smoothed displayed frequency to reduce jitter.
     this.smoothedFreq = -1;
+  }
+
+  // Map a frequency to an integer bin ~25 cents wide, so nearby detections
+  // (including the natural jitter of the noise estimate) share a bin.
+  freqToBin(freq) {
+    return Math.round(1200 * Math.log2(freq / MIN_FREQ) / 25);
+  }
+
+  // True when freq falls in a blacklisted noise bin (or an adjacent one).
+  isNoiseFreq(freq) {
+    const b = this.freqToBin(freq);
+    const bins = this.denoise.bins;
+    return bins.has(b) || bins.has(b - 1) || bins.has(b + 1);
+  }
+
+  toggleDenoise() {
+    const d = this.denoise;
+    if (d.state === 'off') {
+      d.state = 'delay';
+      d.startTime = performance.now();
+      d.samples = [];
+      d.bins = new Set();
+      this.denoiseButton.textContent = 'ノイズ除去 (クリア)';
+    } else {
+      // Cancel an in-progress calibration or clear an active profile.
+      d.state = 'off';
+      d.samples = [];
+      d.bins = new Set();
+      this.denoiseButton.textContent = 'ノイズ除去';
+      this.denoiseStatus.textContent = '未適用';
+    }
+  }
+
+  // Advance the noise-removal state machine each frame, given the frequency
+  // detected this frame (-1 if none).
+  stepDenoise(freq) {
+    const d = this.denoise;
+    if (d.state === 'off' || d.state === 'active') {
+      return;
+    }
+    const elapsed = performance.now() - d.startTime;
+    if (d.state === 'delay') {
+      this.denoiseStatus.textContent =
+          '測定準備中… ' + Math.ceil((1000 - elapsed) / 1000) + 's';
+      if (elapsed >= 1000) {
+        d.state = 'measuring';
+        d.startTime = performance.now();
+        d.samples = [];
+      }
+      return;
+    }
+    // measuring
+    if (freq > 0) {
+      d.samples.push(freq);
+    }
+    this.denoiseStatus.textContent =
+        'ノイズ測定中… ' + Math.ceil((2000 - elapsed) / 1000) + 's';
+    if (elapsed >= 2000) {
+      this.finishDenoise();
+    }
+  }
+
+  // Build the blacklist from the collected noise samples: any bin seen at
+  // least twice during the measurement window.
+  finishDenoise() {
+    const d = this.denoise;
+    const counts = new Map();
+    for (const f of d.samples) {
+      const b = this.freqToBin(f);
+      counts.set(b, (counts.get(b) || 0) + 1);
+    }
+    d.bins = new Set();
+    for (const [b, c] of counts) {
+      if (c >= 2) {
+        d.bins.add(b);
+      }
+    }
+    d.state = 'active';
+    this.denoiseStatus.textContent = '適用中 (' + d.bins.size + 'ヶ所抑制)';
   }
 
   async toggle() {
@@ -268,8 +360,15 @@ class Tuner {
     this.levelValue.textContent = bufferRms(this.buf).toFixed(3);
 
     const freq = detectPitch(this.buf, this.audioCtx.sampleRate, this.minRms);
-    if (freq <= 0) {
-      // Show idle state when nothing is sounding.
+
+    // Drive the noise-removal calibration with this frame's detection, then
+    // suppress detections that fall in a blacklisted noise bin.
+    this.stepDenoise(freq);
+    const isNoise =
+        this.denoise.state === 'active' && freq > 0 && this.isNoiseFreq(freq);
+
+    if (freq <= 0 || isNoise) {
+      // Show idle state when nothing is sounding (or it is just floor noise).
       this.noteRef.textContent = '--';
       this.centsRef.innerHTML = '&nbsp;';
       this.freqRef.innerHTML = '&nbsp;';

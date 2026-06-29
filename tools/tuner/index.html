@@ -31,6 +31,8 @@
   #thresholdControl { margin: 1rem auto; max-width: 400px; color: #aaa; font-size: 0.9rem; }
   #threshold { width: 80%; }
   #level { margin-top: 0.4rem; font-size: 0.85rem; color: #777; }
+  #denoiseButton { background: #555; font-size: 0.9rem; padding: 0.4rem 1rem; }
+  #denoiseStatus { margin-top: 0.4rem; font-size: 0.85rem; color: #777; }
   button {
     font-size: 1rem;
     padding: 0.5rem 1.2rem;
@@ -60,6 +62,9 @@
   <label for="threshold">最小振幅 (感度): <span id="thresholdValue">0.010</span></label><br>
   <input type="range" id="threshold" min="0" max="0.1" step="0.001" value="0.01">
   <div id="level">入力レベル: <span id="levelValue">0.000</span></div>
+  <hr style="border-color:#333">
+  <button id="denoiseButton">ノイズ除去</button>
+  <div id="denoiseStatus">未適用</div>
 </div>
 <canvas id="visualiser" width="400" height="120"></canvas>
 <script type="text/javascript" src="./index.js"></script>
