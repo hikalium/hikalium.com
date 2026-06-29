@@ -168,6 +168,17 @@ class Tuner {
     this.startButton = document.querySelector('#startButton');
     this.startButton.onclick = this.toggle.bind(this);
 
+    // Input gain, applied before analysis so quiet sources can be boosted.
+    this.gainSlider = document.querySelector('#gain');
+    this.gainValue = document.querySelector('#gainValue');
+    this.gainSlider.oninput = () => {
+      const g = parseFloat(this.gainSlider.value);
+      this.gainValue.textContent = g.toFixed(1);
+      if (this.gainNode) {
+        this.gainNode.gain.value = g;
+      }
+    };
+
     // Minimum input amplitude (RMS) required to attempt pitch detection.
     this.thresholdSlider = document.querySelector('#threshold');
     this.thresholdValue = document.querySelector('#thresholdValue');
@@ -218,7 +229,11 @@ class Tuner {
     this.analyser.fftSize = 4096;
     this.buf = new Float32Array(this.analyser.fftSize);
     this.source = this.audioCtx.createMediaStreamSource(stream);
-    this.source.connect(this.analyser);
+    // source -> gain -> analyser, so the gain slider boosts quiet inputs.
+    this.gainNode = this.audioCtx.createGain();
+    this.gainNode.gain.value = parseFloat(this.gainSlider.value);
+    this.source.connect(this.gainNode);
+    this.gainNode.connect(this.analyser);
 
     this.running = true;
     this.startButton.textContent = 'Stop';
@@ -232,6 +247,7 @@ class Tuner {
       this.audioCtx.close();
       this.audioCtx = null;
     }
+    this.gainNode = null;
     this.noteRef.textContent = '--';
     this.centsRef.innerHTML = '&nbsp;';
     this.freqRef.innerHTML = '&nbsp;';
