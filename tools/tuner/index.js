@@ -27,6 +27,11 @@ function bufferRms(buf) {
   return Math.sqrt(rms / buf.length);
 }
 
+// Musical pitch range we accept. Frequencies outside this are almost always
+// spurious (e.g. a one-sample period yields the sample rate itself, ~48 kHz).
+const MIN_FREQ = 40;    // a touch below the lowest bass string (E1 ~41 Hz)
+const MAX_FREQ = 2200;  // a touch above the highest common note (C7 ~2093 Hz)
+
 // Autocorrelation-based pitch detection. Returns the fundamental frequency in
 // Hz, or -1 when the signal is quieter than minRms / not periodic enough.
 function detectPitch(buf, sampleRate, minRms) {
@@ -73,15 +78,22 @@ function detectPitch(buf, sampleRate, minRms) {
     c[lag] = sum;
   }
 
-  // Skip the descending slope from lag 0, then find the highest peak: that lag
-  // is the period of the fundamental.
+  // Only consider lags within the accepted musical pitch range. A period
+  // shorter than minLag would correspond to a frequency above MAX_FREQ (in the
+  // limit, a one-sample period gives the sample rate itself), which is what
+  // produced the spurious ~48 kHz readings on noise.
+  const minLag = Math.max(2, Math.floor(sampleRate / MAX_FREQ));
+  const maxLagAllowed = Math.min(n - 1, Math.ceil(sampleRate / MIN_FREQ));
+
+  // Skip the descending slope from lag 0, then find the highest peak within the
+  // allowed range: that lag is the period of the fundamental.
   let d = 0;
   while (d < n - 1 && c[d] > c[d + 1]) {
     d++;
   }
   let maxVal = -1;
   let maxLag = -1;
-  for (let lag = d; lag < n; lag++) {
+  for (let lag = Math.max(d, minLag); lag <= maxLagAllowed; lag++) {
     if (c[lag] > maxVal) {
       maxVal = c[lag];
       maxLag = lag;
@@ -131,7 +143,11 @@ function detectPitch(buf, sampleRate, minRms) {
     }
   }
 
-  return sampleRate / period;
+  const freq = sampleRate / period;
+  if (freq < MIN_FREQ || freq > MAX_FREQ) {
+    return -1;
+  }
+  return freq;
 }
 
 class Tuner {
