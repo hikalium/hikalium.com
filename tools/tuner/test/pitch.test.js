@@ -1,7 +1,17 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const {frequencyToNote, bufferRms, detectPitch, MIN_FREQ, MAX_FREQ} =
-    require('../pitch.js');
+const {
+  frequencyToNote,
+  bufferRms,
+  detectPitch,
+  MIN_FREQ,
+  MAX_FREQ,
+  binToFreq,
+  freqToFftBin,
+  subtractNoiseSpectrum,
+  spectrumPeak,
+  gatePasses,
+} = require('../pitch.js');
 
 const SR = 48000;
 const N = 4096;
@@ -104,4 +114,44 @@ test('bufferRms is zero for silence and ~0.707 for a unit sine', () => {
   assert.strictEqual(bufferRms(new Float32Array(N)), 0);
   const rms = bufferRms(makeTone(440, 1.0, false));
   assert.ok(Math.abs(rms - Math.SQRT1_2) < 0.01, `rms=${rms}`);
+});
+
+// --- FFT-spectrum helpers ---
+
+test('binToFreq and freqToFftBin round-trip', () => {
+  assert.ok(Math.abs(binToFreq(100, 48000, 4096) - 1171.875) < 1e-6);
+  assert.strictEqual(freqToFftBin(440, 48000, 4096), 38);  // 440*4096/48000 = 37.5 -> 38
+  // a bin maps back to the frequency it stands for
+  assert.strictEqual(freqToFftBin(binToFreq(50, 48000, 4096), 48000, 4096), 50);
+});
+
+test('subtractNoiseSpectrum clamps at zero and over-subtracts by alpha', () => {
+  const mag = new Float32Array([1.0, 2.0, 0.5, 3.0]);
+  const noise = new Float32Array([0.5, 0.5, 0.5, 0.5]);
+  const out = subtractNoiseSpectrum(mag, noise, 1.0);
+  assert.deepStrictEqual(Array.from(out), [0.5, 1.5, 0, 2.5]);
+  // alpha=2 subtracts twice the noise; 0.5 - 2*0.5 < 0 -> clamped
+  const out2 = subtractNoiseSpectrum(mag, noise, 2.0);
+  assert.deepStrictEqual(Array.from(out2), [0, 1.0, 0, 2.0]);
+  // a null noise profile passes the magnitudes through unchanged
+  assert.deepStrictEqual(Array.from(subtractNoiseSpectrum(mag, null, 1.5)),
+                         Array.from(mag));
+});
+
+test('spectrumPeak finds the max within the bin range', () => {
+  const mag = new Float32Array([9, 1, 5, 2, 8, 3]);
+  assert.deepStrictEqual(spectrumPeak(mag, 1, 4), {bin: 4, value: 8});
+  // bin 0 (value 9) is excluded by the range
+  assert.deepStrictEqual(spectrumPeak(mag, 2, 3), {bin: 2, value: 5});
+});
+
+test('gatePasses requires the cleaned peak to beat the noise floor', () => {
+  const cleaned = new Float32Array([0, 4, 1, 0]);
+  const noise = new Float32Array([0, 2, 1, 0]);
+  assert.strictEqual(gatePasses(cleaned, noise, 0, 3, 1.2), true);   // 4 >= 1.2*2
+  assert.strictEqual(gatePasses(cleaned, noise, 0, 3, 3.0), false);  // 4 < 3*2
+  // with no noise profile the gate passes whenever there is any signal
+  assert.strictEqual(gatePasses(cleaned, null, 0, 3, 1.2), true);
+  assert.strictEqual(gatePasses(new Float32Array([0, 0, 0]), null, 0, 2, 1.2),
+                     false);
 });

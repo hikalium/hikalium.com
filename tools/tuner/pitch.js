@@ -150,8 +150,73 @@ function detectPitch(buf, sampleRate, minRms) {
   return freq;
 }
 
+// --- FFT-spectrum helpers (used for the spectrum graph and noise removal) ---
+//
+// The spectrum itself comes from the Web Audio AnalyserNode in the browser
+// (its built-in FFT), so these helpers operate on a magnitude array and stay
+// free of any audio API, which keeps them unit-testable.
+
+// Frequency (Hz) at a given FFT bin index.
+function binToFreq(bin, sampleRate, fftSize) {
+  return bin * sampleRate / fftSize;
+}
+
+// FFT bin index nearest to a given frequency.
+function freqToFftBin(freq, sampleRate, fftSize) {
+  return Math.round(freq * fftSize / sampleRate);
+}
+
+// Spectral subtraction: cleaned[i] = max(0, mag[i] - alpha * noise[i]).
+// `alpha` > 1 over-subtracts, trading a little signal for stronger noise
+// suppression. Returns a new Float32Array.
+function subtractNoiseSpectrum(mag, noise, alpha) {
+  const out = new Float32Array(mag.length);
+  for (let i = 0; i < mag.length; i++) {
+    const v = mag[i] - alpha * (noise ? noise[i] : 0);
+    out[i] = v > 0 ? v : 0;
+  }
+  return out;
+}
+
+// Largest magnitude (and its bin) within [minBin, maxBin], inclusive.
+function spectrumPeak(mag, minBin, maxBin) {
+  let bin = -1, value = -1;
+  const hi = Math.min(maxBin, mag.length - 1);
+  for (let i = Math.max(0, minBin); i <= hi; i++) {
+    if (mag[i] > value) {
+      value = mag[i];
+      bin = i;
+    }
+  }
+  return {bin, value};
+}
+
+// Noise gate at the spectrum level: a tonal component is considered present
+// when the cleaned spectrum still has a peak at least `ratio` times the
+// measured noise floor's peak in the band. With no noise profile (peak 0) this
+// always passes, matching the un-calibrated behaviour.
+function gatePasses(cleaned, noise, minBin, maxBin, ratio) {
+  const sigPeak = spectrumPeak(cleaned, minBin, maxBin).value;
+  if (sigPeak <= 0) {
+    return false;
+  }
+  const noisePeak = noise ? spectrumPeak(noise, minBin, maxBin).value : 0;
+  return sigPeak >= ratio * noisePeak;
+}
+
 // Export for the Node test suite. In the browser `module` is undefined, so the
 // functions above simply remain as globals for index.js to use.
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {frequencyToNote, bufferRms, detectPitch, MIN_FREQ, MAX_FREQ};
+  module.exports = {
+    frequencyToNote,
+    bufferRms,
+    detectPitch,
+    MIN_FREQ,
+    MAX_FREQ,
+    binToFreq,
+    freqToFftBin,
+    subtractNoiseSpectrum,
+    spectrumPeak,
+    gatePasses,
+  };
 }

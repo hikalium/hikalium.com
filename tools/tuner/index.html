@@ -27,7 +27,9 @@
   .flat { color: #4aa3ff; }
   .sharpish { color: #ff7a4a; }
   #meter { display: block; margin: 0.5rem auto; max-width: 100%; }
+  #spectrum { display: block; margin: 0.5rem auto; max-width: 100%; }
   #visualiser { display: block; margin: 0.5rem auto; max-width: 100%; }
+  .caption { font-size: 0.75rem; color: #666; margin-top: -0.2rem; }
   #thresholdControl { margin: 1rem auto; max-width: 400px; color: #aaa; font-size: 0.9rem; }
   #threshold { width: 80%; }
   #level { margin-top: 0.4rem; font-size: 0.85rem; color: #777; }
@@ -66,7 +68,10 @@
   <button id="denoiseButton">ノイズ除去</button>
   <div id="denoiseStatus">未適用</div>
 </div>
+<canvas id="spectrum" width="400" height="160"></canvas>
+<div class="caption">FFTスペクトル（白=ノイズ除去後 / 赤=ノイズ床）</div>
 <canvas id="visualiser" width="400" height="120"></canvas>
+<div class="caption">波形</div>
 <script type="text/javascript" src="./pitch.js"></script>
 <script type="text/javascript" src="./index.js"></script>
 </body>

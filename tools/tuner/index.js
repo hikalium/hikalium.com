@@ -1,8 +1,20 @@
 // Tuner: detects the fundamental frequency from the mic waveform and shows
 // the nearest musical note together with how many cents it is off.
 //
-// The pure detection logic (frequencyToNote, bufferRms, detectPitch, MIN_FREQ,
-// MAX_FREQ) lives in pitch.js, which index.html loads before this file.
+// The pure detection logic (frequencyToNote, bufferRms, detectPitch, the FFT
+// spectrum helpers, MIN_FREQ, MAX_FREQ) lives in pitch.js, which index.html
+// loads before this file.
+
+const DENOISE_ALPHA = 1.5;          // spectral-subtraction over-subtraction
+const GATE_RATIO = 1.2;             // cleaned peak must exceed ratio * noise peak
+const SPECTRUM_MAX_FREQ = 2500;     // highest frequency drawn on the graph (Hz)
+const SPECTRUM_MIN_DB = -100;       // dB range mapped onto the graph height
+const SPECTRUM_MAX_DB = 0;
+
+// Convert a magnitude in dBFS (as returned by AnalyserNode) to linear scale.
+function dbToLinear(db) {
+  return Math.pow(10, db / 20);
+}
 
 class Tuner {
   constructor() {
@@ -16,6 +28,8 @@ class Tuner {
     this.freqRef = document.querySelector('#freq');
     this.meter = document.querySelector('#meter');
     this.meterCtx = this.meter.getContext('2d');
+    this.spectrum = document.querySelector('#spectrum');
+    this.spectrumCtx = this.spectrum.getContext('2d');
     this.visualiser = document.querySelector('#visualiser');
     this.visCtx = this.visualiser.getContext('2d');
 
@@ -43,34 +57,23 @@ class Tuner {
       this.thresholdValue.textContent = this.minRms.toFixed(3);
     };
 
-    // Floor-noise removal. Pressing the button waits 1s, then records the
-    // frequencies detected over the next 2s (assumed to be floor noise) and
-    // suppresses those frequency bins from later detections.
+    // Floor-noise removal, applied at the FFT level. Pressing the button waits
+    // 1s, then averages the magnitude spectrum over the next 2s (assumed to be
+    // floor noise). That noise spectrum is then subtracted from the live
+    // spectrum (spectral subtraction) and used as a noise gate for detection.
     this.denoiseButton = document.querySelector('#denoiseButton');
     this.denoiseStatus = document.querySelector('#denoiseStatus');
     this.denoiseButton.onclick = this.toggleDenoise.bind(this);
     this.denoise = {
-      state : 'off',       // 'off' | 'delay' | 'measuring' | 'active'
-      startTime : 0,       // performance.now() when the current phase began
-      samples : [],        // detected frequencies collected while measuring
-      bins : new Set(),    // blacklisted frequency bins (see freqToBin)
+      state : 'off',     // 'off' | 'delay' | 'measuring' | 'active'
+      startTime : 0,     // performance.now() when the current phase began
+      accum : null,      // running sum of linear magnitude spectra
+      frames : 0,        // number of frames summed into accum
+      noise : null,      // averaged noise magnitude spectrum (linear), or null
     };
 
     // Smoothed displayed frequency to reduce jitter.
     this.smoothedFreq = -1;
-  }
-
-  // Map a frequency to an integer bin ~25 cents wide, so nearby detections
-  // (including the natural jitter of the noise estimate) share a bin.
-  freqToBin(freq) {
-    return Math.round(1200 * Math.log2(freq / MIN_FREQ) / 25);
-  }
-
-  // True when freq falls in a blacklisted noise bin (or an adjacent one).
-  isNoiseFreq(freq) {
-    const b = this.freqToBin(freq);
-    const bins = this.denoise.bins;
-    return bins.has(b) || bins.has(b - 1) || bins.has(b + 1);
   }
 
   toggleDenoise() {
@@ -78,22 +81,24 @@ class Tuner {
     if (d.state === 'off') {
       d.state = 'delay';
       d.startTime = performance.now();
-      d.samples = [];
-      d.bins = new Set();
+      d.accum = null;
+      d.frames = 0;
+      d.noise = null;
       this.denoiseButton.textContent = 'ノイズ除去 (クリア)';
     } else {
       // Cancel an in-progress calibration or clear an active profile.
       d.state = 'off';
-      d.samples = [];
-      d.bins = new Set();
+      d.accum = null;
+      d.frames = 0;
+      d.noise = null;
       this.denoiseButton.textContent = 'ノイズ除去';
       this.denoiseStatus.textContent = '未適用';
     }
   }
 
-  // Advance the noise-removal state machine each frame, given the frequency
-  // detected this frame (-1 if none).
-  stepDenoise(freq) {
+  // Advance the noise-removal state machine each frame, accumulating the live
+  // linear magnitude spectrum while measuring.
+  stepDenoise(liveMag) {
     const d = this.denoise;
     if (d.state === 'off' || d.state === 'active') {
       return;
@@ -105,14 +110,16 @@ class Tuner {
       if (elapsed >= 1000) {
         d.state = 'measuring';
         d.startTime = performance.now();
-        d.samples = [];
+        d.accum = new Float32Array(liveMag.length);
+        d.frames = 0;
       }
       return;
     }
-    // measuring
-    if (freq > 0) {
-      d.samples.push(freq);
+    // measuring: sum the spectrum
+    for (let i = 0; i < liveMag.length; i++) {
+      d.accum[i] += liveMag[i];
     }
+    d.frames++;
     this.denoiseStatus.textContent =
         'ノイズ測定中… ' + Math.ceil((2000 - elapsed) / 1000) + 's';
     if (elapsed >= 2000) {
@@ -120,23 +127,20 @@ class Tuner {
     }
   }
 
-  // Build the blacklist from the collected noise samples: any bin seen at
-  // least twice during the measurement window.
+  // Average the accumulated spectra into the noise profile.
   finishDenoise() {
     const d = this.denoise;
-    const counts = new Map();
-    for (const f of d.samples) {
-      const b = this.freqToBin(f);
-      counts.set(b, (counts.get(b) || 0) + 1);
-    }
-    d.bins = new Set();
-    for (const [b, c] of counts) {
-      if (c >= 2) {
-        d.bins.add(b);
+    d.noise = new Float32Array(d.accum.length);
+    if (d.frames > 0) {
+      for (let i = 0; i < d.accum.length; i++) {
+        d.noise[i] = d.accum[i] / d.frames;
       }
     }
     d.state = 'active';
-    this.denoiseStatus.textContent = '適用中 (' + d.bins.size + 'ヶ所抑制)';
+    const peak = spectrumPeak(d.noise, this.minBin, this.maxBin);
+    const peakHz = binToFreq(peak.bin, this.sampleRate, this.fftSize);
+    this.denoiseStatus.textContent =
+        '適用中 (ノイズ床ピーク ' + peakHz.toFixed(0) + 'Hz)';
   }
 
   async toggle() {
@@ -173,6 +177,7 @@ class Tuner {
     this.audioCtx = new AudioContext();
     this.analyser = this.audioCtx.createAnalyser();
     this.analyser.fftSize = 4096;
+    this.analyser.smoothingTimeConstant = 0.5;
     this.buf = new Float32Array(this.analyser.fftSize);
     this.source = this.audioCtx.createMediaStreamSource(stream);
     // source -> gain -> analyser, so the gain slider boosts quiet inputs.
@@ -180,6 +185,14 @@ class Tuner {
     this.gainNode.gain.value = parseFloat(this.gainSlider.value);
     this.source.connect(this.gainNode);
     this.gainNode.connect(this.analyser);
+
+    // FFT spectrum buffers and the musical band we care about.
+    this.sampleRate = this.audioCtx.sampleRate;
+    this.fftSize = this.analyser.fftSize;
+    this.freqDataDb = new Float32Array(this.analyser.frequencyBinCount);
+    this.liveMag = new Float32Array(this.analyser.frequencyBinCount);
+    this.minBin = freqToFftBin(MIN_FREQ, this.sampleRate, this.fftSize);
+    this.maxBin = freqToFftBin(MAX_FREQ, this.sampleRate, this.fftSize);
 
     this.running = true;
     this.startButton.textContent = 'Stop';
@@ -199,6 +212,7 @@ class Tuner {
     this.freqRef.innerHTML = '&nbsp;';
     this.smoothedFreq = -1;
     this.drawMeter(null);
+    this.clearSpectrum();
   }
 
   update() {
@@ -213,16 +227,24 @@ class Tuner {
     // Show the live input level so the user can pick a sensible threshold.
     this.levelValue.textContent = bufferRms(this.buf).toFixed(3);
 
+    // FFT magnitude spectrum (linear) from the analyser's built-in FFT.
+    this.analyser.getFloatFrequencyData(this.freqDataDb);
+    for (let i = 0; i < this.freqDataDb.length; i++) {
+      this.liveMag[i] = dbToLinear(this.freqDataDb[i]);
+    }
+
+    // Drive the noise calibration, then subtract the noise spectrum and gate.
+    this.stepDenoise(this.liveMag);
+    const noise = this.denoise.noise;
+    const cleaned = subtractNoiseSpectrum(this.liveMag, noise, DENOISE_ALPHA);
+    this.drawSpectrum(cleaned, noise);
+
     const freq = detectPitch(this.buf, this.audioCtx.sampleRate, this.minRms);
+    const passesGate =
+        gatePasses(cleaned, noise, this.minBin, this.maxBin, GATE_RATIO);
 
-    // Drive the noise-removal calibration with this frame's detection, then
-    // suppress detections that fall in a blacklisted noise bin.
-    this.stepDenoise(freq);
-    const isNoise =
-        this.denoise.state === 'active' && freq > 0 && this.isNoiseFreq(freq);
-
-    if (freq <= 0 || isNoise) {
-      // Show idle state when nothing is sounding (or it is just floor noise).
+    if (freq <= 0 || !passesGate) {
+      // Idle when nothing is sounding or the gate rejected it as floor noise.
       this.noteRef.textContent = '--';
       this.centsRef.innerHTML = '&nbsp;';
       this.freqRef.innerHTML = '&nbsp;';
@@ -300,6 +322,74 @@ class Tuner {
     ctx.moveTo(x, H - 20);
     ctx.lineTo(x, 6);
     ctx.stroke();
+  }
+
+  // Draw the FFT spectrum: the cleaned (noise-subtracted) magnitude in white
+  // and, when calibrated, the measured noise floor in red. Frequency axis is
+  // linear from 0 to SPECTRUM_MAX_FREQ; vertical axis is dB.
+  drawSpectrum(cleaned, noise) {
+    const ctx = this.spectrumCtx;
+    const W = this.spectrum.width;
+    const H = this.spectrum.height;
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, W, H);
+
+    const displayMaxBin = Math.min(
+        cleaned.length - 1,
+        freqToFftBin(SPECTRUM_MAX_FREQ, this.sampleRate, this.fftSize));
+    if (displayMaxBin <= 0) {
+      return;
+    }
+    const toX = (bin) => bin / displayMaxBin * W;
+    const toY = (v) => {
+      const db = v > 0 ? 20 * Math.log10(v) : SPECTRUM_MIN_DB;
+      const t = (db - SPECTRUM_MIN_DB) / (SPECTRUM_MAX_DB - SPECTRUM_MIN_DB);
+      return H - Math.max(0, Math.min(1, t)) * H;
+    };
+
+    // Frequency gridlines and labels.
+    ctx.fillStyle = '#666';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+    for (const f of [100, 250, 500, 1000, 2000]) {
+      const x = toX(freqToFftBin(f, this.sampleRate, this.fftSize));
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+      ctx.fillText(f >= 1000 ? f / 1000 + 'k' : f, x, H - 2);
+    }
+
+    // Noise floor (red line).
+    if (noise) {
+      ctx.strokeStyle = '#c44';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let bin = 0; bin <= displayMaxBin; bin++) {
+        const x = toX(bin), y = toY(noise[bin] * DENOISE_ALPHA);
+        bin === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    // Cleaned spectrum (white filled area).
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let bin = 0; bin <= displayMaxBin; bin++) {
+      ctx.lineTo(toX(bin), toY(cleaned[bin]));
+    }
+    ctx.lineTo(toX(displayMaxBin), H);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  clearSpectrum() {
+    const ctx = this.spectrumCtx;
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, this.spectrum.width, this.spectrum.height);
   }
 
   drawWaveform() {
