@@ -5,6 +5,17 @@
  - https://developers.yubico.com/PIV/Introduction/Certificate_slots.html
  - http://www.cuspy.org/diary/2015-08-11-yubikey-piv-ssh/
 
+## initial setup
+
+```
+sudo apt install yubikey-manager
+ykman list
+ykman info
+ykman otp delete 1
+ykman config usb --disable OTP
+ykman config set-lock-code -g
+```
+
 ## 手順
 
 ### SSH app on ChromeOS (Not in Crostini, the Linux environment)
