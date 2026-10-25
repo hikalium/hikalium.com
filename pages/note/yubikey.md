@@ -16,6 +16,20 @@ ykman config usb --disable OTP
 ykman config set-lock-code -g
 ```
 
+```
+# GnuPGがカード接続を保持していない状態にする。
+gpgconf --kill scdaemon
+
+# 接続失敗のままになったPC/SCサービスを再起動する。
+sudo systemctl restart pcscd
+
+# PC/SCがYubiKeyをカードリーダーとして認識したか確認する。
+ykman list --readers
+
+# ykmanからOpenPGP領域を読めるか確認する。
+ykman openpgp info
+```
+
 ## 手順
 
 ### SSH app on ChromeOS (Not in Crostini, the Linux environment)
